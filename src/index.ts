@@ -17,6 +17,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: corsOptions,
   });
+
   app.setGlobalPrefix('api/v1');
 
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
@@ -39,6 +40,9 @@ async function bootstrap() {
 
   const port = process.env.PORT || 5000;
   await app.listen(port);
+
+  console.log('PORT', process.env.PORT);
+  console.log('NODE_ENV', process.env.NODE_ENV);
 
   const appContext = await NestFactory.createApplicationContext(SeederModule);
   const seederService = appContext.get(SeederService);
