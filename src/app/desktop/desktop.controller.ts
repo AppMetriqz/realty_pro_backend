@@ -22,8 +22,9 @@ export class DesktopController {
   @Public()
   @Get('google/callback')
   @UseFilters(new HttpExceptionFilter())
-  googleCallback(@Req() req: Request) {
-    return this.service.googleCallback(req);
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    const url = await this.service.googleCallback(req);
+    res.redirect(302, url);
   }
 
   @Get('google/calendar')

@@ -6,10 +6,12 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { UnitModel } from '../unit/unit.model';
 import { SaleModel } from '../sale/sale.model';
+import { ProjectModel } from '../project/project.model';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
+      ProjectModel,
       PaymentPlanModel,
       PaymentPlanDetailModel,
       UnitModel,

@@ -164,6 +164,6 @@ export class DesktopService {
     const code = req.query.code;
     const { tokens } = await this.oAuth2Client.getToken(code);
     this.oAuth2Client.setCredentials(tokens);
-    console.log('login');
+    return this.configService.get<string>('GOOGLE_CALLBACK_URL_READY');
   }
 }

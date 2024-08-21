@@ -378,15 +378,20 @@ export class ProjectService {
 
   async findAllAutocomplete(filters: FindAllAutocompleteDto) {
     const description = filters.description;
+    const currencyType = filters.currencyType;
+
+    const where: { currency_type?: string } = {};
+
+    if (_.size(currencyType) > 0) {
+      where.currency_type = currencyType;
+    }
+
     return await this.model.findAll({
       limit: 10,
-      attributes: ['project_id', 'name', 'city', 'sector', 'address'],
       order: [['name', 'ASC']],
       where: {
-        [Op.or]: [
-          { name: { [Op.like]: `%${description}%` } },
-          { description: { [Op.like]: `%${description}%` } },
-        ],
+        ...where,
+        [Op.or]: [{ name: { [Op.like]: `%${description}%` } }],
       },
     });
   }
