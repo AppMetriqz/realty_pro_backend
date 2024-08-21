@@ -221,6 +221,11 @@ export class SaleService {
 
       const sales = await this.model.bulkCreate(values, { transaction });
 
+      await this.unit.update(
+        { status: 'sold' },
+        { where: { unit_id: unit_ids }, transaction },
+      );
+
       const seller_id = body.seller_id;
       if (seller_id) {
         for (let i = 0; i < sales.length; i++) {
@@ -294,6 +299,7 @@ export class SaleService {
       PaymentPlanDetail: this.PaymentPlanDetail,
       Payment: this.Payment,
       Project: this.Project,
+      Unit: this.unit,
       sale_id: model.sale_id,
       isSale: true,
       Sale: this.model,

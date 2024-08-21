@@ -17,7 +17,15 @@ import { SaleClientHistoryModel } from '../sale-client-history/sale-client-histo
 import { SaleClientHistoryDto } from '../sale-client-history/sale-client-history.dto';
 import { StageStatus } from '../../common/constants';
 
-@Table({ tableName: 'sales' })
+@Table({
+  tableName: 'sales',
+  indexes: [
+    {
+      unique: true,
+      fields: ['project_id', 'unit_id'],
+    },
+  ],
+})
 export class SaleModel extends Model<SaleDto> {
   @PrimaryKey
   @AutoIncrement

@@ -134,6 +134,23 @@ export const onFullCancellation = async ({
       );
     }
 
+    if (isSale && !isUnit && !isProject) {
+      const sale = await Sale.findByPk(sale_id, { transaction });
+      await Unit.update(
+        {
+          notes: notes,
+          update_by: user_id,
+          status: 'available',
+        },
+        {
+          where: {
+            unit_id: sale.unit_id,
+          },
+          transaction,
+        },
+      );
+    }
+
     const values = {
       status: 'canceled',
       is_active: payment_plan_is_active,
@@ -162,7 +179,7 @@ export const onFullCancellation = async ({
       transaction,
     });
 
-    await Promise.all([promise1, promise2, promise3]);
+    await Promise.allSettled([promise1, promise2, promise3]);
 
     const description1 = `Plan de pago se ha cancelado.`;
     const description2 = notes;

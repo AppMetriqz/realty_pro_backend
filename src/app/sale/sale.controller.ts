@@ -9,12 +9,7 @@ import {
   Query,
   Delete,
 } from '@nestjs/common';
-import {
-  CreateAllDto,
-  CreateDto,
-  FindAllDto,
-  UpdateDto,
-} from './sale.dto';
+import { CreateAllDto, CreateDto, FindAllDto, UpdateDto } from './sale.dto';
 import { SaleService } from './sale.service';
 import { CatchException, HttpExceptionFilter } from '../../common/exceptions';
 import * as _ from 'lodash';

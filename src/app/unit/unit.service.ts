@@ -19,9 +19,7 @@ import * as fs from 'fs-extra';
 import { UnitPropertyFeaturesModel } from '../unit-property-features/unit-property-features.model';
 import { UnitPropertyFeaturesDto } from '../unit-property-features/unit-property-features.dto';
 import { ProjectModel } from '../project/project.model';
-import { PropertyFeaturesModel } from '../property-features/property-features.model';
 import { SaleModel } from '../sale/sale.model';
-import { ContactModel } from '../contact/contact.model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { PaymentModel } from '../payment/payment.model';
@@ -190,9 +188,14 @@ export class UnitService {
     const model = await this.model.findByPk(id);
     if (!model) {
       return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
+        ...StatusCodes.NotFound,
+      };
+    }
+
+    if (model.status === 'sold') {
+      return {
+        ...StatusCodes.BadRequest,
+        message: 'Esta unidad ya está vendida, no se puede editar.',
       };
     }
 
@@ -300,6 +303,7 @@ export class UnitService {
         transaction,
         where: {
           unit_id: unit_ids,
+          status: { [Op.notIn]: ['sold'] },
           type: { [isPlot ? Op.in : Op.notIn]: ['plot'] },
         },
       });
@@ -335,29 +339,6 @@ export class UnitService {
           );
         }
       }
-      // await this.unitPropertyFeatures.destroy({
-      //   where: {
-      //     unit_id: unit_ids,
-      //   },
-      //   transaction: transaction,
-      // });
-      //
-      // const propertyFeatures: UnitPropertyFeaturesDto[] = _.flatten(
-      //   _.map(units, (unit) => {
-      //     return property_feature_ids.map((property_feature_id: number) => {
-      //       return {
-      //         property_feature_id: property_feature_id,
-      //         project_id: project_id,
-      //         unit_id: unit.unit_id,
-      //       };
-      //     });
-      //   }),
-      // );
-      //
-      // await this.unitPropertyFeatures.bulkCreate(propertyFeatures, {
-      //   transaction,
-      //   ignoreDuplicates: true,
-      // });
 
       return { message: 'updated' };
     });
