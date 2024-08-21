@@ -1,11 +1,14 @@
 {
   "name": "realty.prop",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
   "author": "",
   "main": "index",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

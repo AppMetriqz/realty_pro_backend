@@ -43,6 +43,7 @@ async function bootstrap() {
 
   console.log('PORT', process.env.PORT);
   console.log('NODE_ENV', process.env.NODE_ENV);
+  console.log('Version', '1.0.0');
 
   const appContext = await NestFactory.createApplicationContext(SeederModule);
   const seederService = appContext.get(SeederService);
