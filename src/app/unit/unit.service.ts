@@ -87,10 +87,14 @@ export class UnitService {
       limit,
       offset,
       order,
+      distinct: true,
       include: [
         {
           model: SaleModel,
           attributes: ['sale_id'],
+          where: {
+            is_active: true,
+          },
         },
       ],
       where: { ...where },

@@ -32,6 +32,7 @@ export class DesktopService {
 
   async findAllGoogleCalendar(filters: GoogleCalendarDto) {
     const token = this.oAuth2Client.credentials;
+    console.log('token', token);
     if (_.isEmpty(token)) {
       return {
         isNeedLogin: true,
