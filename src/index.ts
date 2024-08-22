@@ -12,11 +12,15 @@ import { SeederService } from './config/database/seeder/seeder.service';
 async function bootstrap() {
   const corsOptions = {
     origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
   };
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: corsOptions,
   });
+
+  app.enableCors(corsOptions);
 
   app.setGlobalPrefix('api/v1');
 

@@ -132,14 +132,11 @@ export class UnitService {
     );
 
     const { client } = _.pick(model.sale, 'client');
+    const sale = _.pick(model.sale, 'sale_id');
 
     return {
       ..._.omit(data, ['unit_property_feature', 'sale']),
-      sale: model.sale?.sale_id
-        ? {
-            sale_id: model.sale.sale_id,
-          }
-        : null,
+      sale: _.size(sale) > 0 ? sale : null,
       client: client ?? null,
       property_feature_ids,
       property_features,

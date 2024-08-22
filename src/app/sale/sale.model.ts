@@ -19,12 +19,6 @@ import { StageStatus } from '../../common/constants';
 
 @Table({
   tableName: 'sales',
-  indexes: [
-    {
-      unique: true,
-      fields: ['project_id', 'unit_id'],
-    },
-  ],
 })
 export class SaleModel extends Model<SaleDto> {
   @PrimaryKey

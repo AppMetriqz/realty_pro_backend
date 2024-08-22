@@ -34,8 +34,8 @@ export class DesktopService {
     const token = this.oAuth2Client.credentials;
     if (_.isEmpty(token)) {
       return {
-        ...StatusCodes.UnAuthorized,
-        message: 'Tienes que iniciar sesión en google',
+        isNeedLogin: true,
+        data: [],
       };
     }
 
@@ -72,13 +72,18 @@ export class DesktopService {
       orderBy: 'startTime',
     });
 
-    return _.map(response.data.items, (items) => {
+    const data = _.map(response.data.items, (items) => {
       return {
         summary: items.summary,
-        start: items.start,
-        end: items.end,
+        start: items.start.dateTime,
+        end: items.end.dateTime,
       };
     });
+
+    return {
+      isNeedLogin: false,
+      data,
+    };
   }
 
   async findAllSale() {
