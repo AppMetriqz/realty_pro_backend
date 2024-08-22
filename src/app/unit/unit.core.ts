@@ -30,6 +30,7 @@ export const ModelProperties = {
     {
       model: SaleModel,
       attributes: ['sale_id', 'client_id'],
+      required: false,
       where: {
         is_active: true,
       },

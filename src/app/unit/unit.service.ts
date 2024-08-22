@@ -92,6 +92,7 @@ export class UnitService {
         {
           model: SaleModel,
           attributes: ['sale_id'],
+          required: false,
           where: {
             is_active: true,
           },
