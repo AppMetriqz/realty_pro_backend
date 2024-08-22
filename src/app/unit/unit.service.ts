@@ -26,6 +26,7 @@ import { PaymentModel } from '../payment/payment.model';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { NotificationModel } from '../notification/notification.model';
 import { ModelProperties } from './unit.core';
+import { ContactModel } from '../contact/contact.model';
 
 @Injectable()
 export class UnitService {
@@ -86,6 +87,12 @@ export class UnitService {
       limit,
       offset,
       order,
+      include: [
+        {
+          model: SaleModel,
+          attributes: ['sale_id'],
+        },
+      ],
       where: { ...where },
     });
   }
@@ -128,6 +135,11 @@ export class UnitService {
 
     return {
       ..._.omit(data, ['unit_property_feature', 'sale']),
+      sale: model.sale?.sale_id
+        ? {
+            sale_id: model.sale.sale_id,
+          }
+        : null,
       client: client ?? null,
       property_feature_ids,
       property_features,
