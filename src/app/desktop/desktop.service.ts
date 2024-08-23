@@ -107,7 +107,7 @@ export class DesktopService {
     const offset = filters.pageIndex * filters.pageSize;
     const limit = filters.pageSize;
 
-    return this.Unit.findAll({
+    return this.Unit.findAndCountAll({
       limit,
       offset,
       order: [['name', 'ASC']],
@@ -129,7 +129,7 @@ export class DesktopService {
     const offset = filters.pageIndex * filters.pageSize;
     const limit = filters.pageSize;
 
-    return this.Sale.findAll({
+    return this.Sale.findAndCountAll({
       limit,
       offset,
       where: {

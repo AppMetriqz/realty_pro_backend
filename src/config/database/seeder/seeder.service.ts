@@ -52,6 +52,19 @@ export class SeederService {
 
   async createContacts() {
     const array: CreateDto[] = [
+      // {
+      //   contact_id: 1,
+      //   type: 'seller',
+      //   first_name: 'seller',
+      //   last_name: 'seller',
+      //   email: 'seller@gmail.com',
+      //   phone_number_1: '+18002003006',
+      //   national_id: '1234564',
+      //   nationality: 'Dominicana',
+      //   contact_method: 'Facebook',
+      //   date_of_birth: new Date(),
+      //   marital_status: 'single',
+      // },
       {
         contact_id: 1,
         type: 'seller',
