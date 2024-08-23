@@ -78,11 +78,18 @@ export class ContactService {
         },
         {
           model: SaleModel,
-          attributes: ['sale_id', 'price'],
-          required: true,
-          where: {
-            seller_id: id,
-          },
+          attributes: ['sale_id', 'price', 'commission', 'stage'],
+          include: [
+            {
+              model: ContactModel,
+              attributes: ['contact_id', 'first_name', 'last_name'],
+              as: 'client',
+              where: {
+                contact_id: id,
+              },
+              required: true,
+            },
+          ],
         },
         {
           model: PaymentPlanDetailModel,

@@ -11,7 +11,6 @@ import { SaleModel } from '../sale/sale.model';
 import { ContactModel } from '../contact/contact.model';
 import { Auth, google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
-import { StatusCodes } from '../../common/constants';
 
 @Injectable()
 export class DesktopService {
@@ -107,12 +106,11 @@ export class DesktopService {
     const offset = filters.pageIndex * filters.pageSize;
     const limit = filters.pageSize;
 
-    return this.Unit.findAndCountAll({
+    return this.Sale.findAndCountAll({
       limit,
       offset,
-      order: [['name', 'ASC']],
       where: {
-        status: 'available',
+        client_id: 1,
         is_active: true,
       },
       include: [
@@ -121,7 +119,13 @@ export class DesktopService {
           order: [['project_id', 'ASC']],
           attributes: ['project_id', 'name', 'description'],
         },
+        {
+          model: UnitModel,
+          order: [['unit_id', 'ASC']],
+          attributes: ['unit_id', 'name', 'description'],
+        },
       ],
+      order: [[UnitModel, 'name', 'ASC']],
     });
   }
 
