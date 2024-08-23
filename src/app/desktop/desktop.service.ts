@@ -138,6 +138,7 @@ export class DesktopService {
       offset,
       where: {
         stage: 'separation',
+        client_id: { [Op.ne]: 1 },
         is_active: true,
       },
       include: [
