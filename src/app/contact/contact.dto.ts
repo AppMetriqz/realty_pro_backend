@@ -25,21 +25,21 @@ export class ContactDto {
 export class CreateDto {
   contact_id: number;
   type: string;
-  spouse_id: string;
+  spouse_id?: string;
   first_name: string;
   last_name: string;
   email: string;
   phone_number_1: string;
-  phone_number_2: string;
+  phone_number_2?: string;
   national_id: string;
   nationality: string;
   contact_method: string;
   date_of_birth: Date;
   marital_status: string;
-  notes: string;
-  is_active: boolean;
-  create_by: number;
-  update_by: number;
+  notes?: string;
+  is_active?: boolean;
+  create_by?: number;
+  update_by?: number;
 }
 
 export class UpdateDto {

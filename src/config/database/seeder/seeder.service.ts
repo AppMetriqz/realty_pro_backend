@@ -10,6 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { PasswordGuard } from '../../../common/guards';
 import { PropertyFeaturesModel } from '../../../app/property-features/property-features.model';
 import { PropertyFeaturesDto } from '../../../app/property-features/property-features.dto';
+import { ContactModel } from '../../../app/contact/contact.model';
+import { UnitModel } from '../../../app/unit/unit.model';
+import { ProjectModel } from '../../../app/project/project.model';
+import { CreateDto } from '../../../app/contact/contact.dto';
 
 @Injectable()
 export class SeederService {
@@ -18,6 +22,9 @@ export class SeederService {
     @InjectModel(RoleModel) private readonly role: typeof RoleModel,
     @InjectModel(StatusModel) private readonly status: typeof StatusModel,
     @InjectModel(UserModel) private readonly user: typeof UserModel,
+    @InjectModel(ContactModel) private readonly Contact: typeof ContactModel,
+    @InjectModel(UnitModel) private readonly Unit: typeof UnitModel,
+    @InjectModel(ProjectModel) private readonly Project: typeof ProjectModel,
     @InjectModel(PropertyFeaturesModel)
     private readonly propertyFeatures: typeof PropertyFeaturesModel,
   ) {}
@@ -26,6 +33,7 @@ export class SeederService {
     await Promise.race([
       this.createRoles(),
       this.createStatuses(),
+      this.createContacts(),
       this.createPropertyFeatures(),
     ]);
     await this.createUsers();
@@ -40,6 +48,38 @@ export class SeederService {
       { role_id: 4, name: 'visitor' },
     ];
     return this.role.bulkCreate(array, { ignoreDuplicates: true });
+  }
+
+  async createContacts() {
+    const array: CreateDto[] = [
+      {
+        contact_id: 1,
+        type: 'seller',
+        first_name: 'seller',
+        last_name: 'seller',
+        email: 'seller@gmail.com',
+        phone_number_1: '+18002003006',
+        national_id: '1234564',
+        nationality: 'Dominicana',
+        contact_method: 'Facebook',
+        date_of_birth: new Date(),
+        marital_status: 'single',
+      },
+      {
+        contact_id: 2,
+        type: 'client',
+        first_name: 'John',
+        last_name: 'Doe',
+        email: 'doe@gmail.com',
+        phone_number_1: '+18002003004',
+        national_id: '1234564',
+        nationality: 'Dominicana',
+        contact_method: 'Facebook',
+        date_of_birth: new Date(),
+        marital_status: 'single',
+      },
+    ];
+    return this.Contact.bulkCreate(array, { ignoreDuplicates: true });
   }
 
   async createStatuses() {

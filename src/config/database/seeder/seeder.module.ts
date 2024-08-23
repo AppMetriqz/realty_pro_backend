@@ -7,6 +7,9 @@ import { RoleModel } from '../../../app/role/role.model';
 import { StatusModel } from '../../../app/status/status.model';
 import { UserModel } from '../../../app/user/user.model';
 import { PropertyFeaturesModel } from '../../../app/property-features/property-features.model';
+import { ContactModel } from '../../../app/contact/contact.model';
+import { UnitModel } from '../../../app/unit/unit.model';
+import { ProjectModel } from '../../../app/project/project.model';
 
 @Module({
   imports: [
@@ -17,6 +20,9 @@ import { PropertyFeaturesModel } from '../../../app/property-features/property-f
       StatusModel,
       UserModel,
       PropertyFeaturesModel,
+      ContactModel,
+      UnitModel,
+      ProjectModel,
     ]),
   ],
   providers: [SeederService],

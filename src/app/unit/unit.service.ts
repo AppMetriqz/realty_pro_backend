@@ -305,12 +305,8 @@ export class UnitService {
 
     return await this.sequelize.transaction(async (transaction) => {
       const values = {
-        condition: body.condition,
-        status: body.status,
+        ...body,
         update_by: currentUser.user_id,
-        [isPlot ? 'price_per_meter' : 'price']: isPlot
-          ? body.price_per_meter
-          : body.price,
       };
 
       await this.model.update(values, {
