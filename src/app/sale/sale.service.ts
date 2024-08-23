@@ -60,7 +60,8 @@ export class SaleService {
       created_at?: WhereOperators;
       stage?: string[];
       project_id?: number;
-    } = {};
+      is_active: boolean;
+    } = { is_active: true };
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];
