@@ -145,7 +145,7 @@ export class DesktopService {
         {
           model: ProjectModel,
           order: [['project_id', 'ASC']],
-          attributes: ['project_id', 'name', 'description'],
+          attributes: ['project_id', 'name', 'description', 'currency_type'],
         },
         {
           model: UnitModel,

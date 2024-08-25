@@ -112,11 +112,11 @@ export class PaymentPlanService {
       include: [
         {
           model: ProjectModel,
-          attributes: ['project_id', 'name'],
+          attributes: ['project_id', 'name', 'currency_type'],
         },
         {
           model: PaymentPlanModel,
-          attributes: ['payment_plan_id', 'status'],
+          attributes: ['payment_plan_id', 'status', 'sale_type'],
           include: [
             {
               model: SaleModel,
@@ -125,7 +125,12 @@ export class PaymentPlanService {
                 {
                   model: ContactModel,
                   as: 'client',
-                  attributes: ['contact_id', 'first_name', 'last_name'],
+                  attributes: [
+                    'contact_id',
+                    'first_name',
+                    'last_name',
+                    'phone_number_1',
+                  ],
                   order,
                 },
               ],
