@@ -336,7 +336,7 @@ export class PaymentPlanService {
       const payment_amount = payment_plan_amount / payment_plan_numbers;
 
       const payment_plan_detail = _.map(
-        _.range(1, payment_plan_numbers),
+        _.range(1, payment_plan_numbers + 1),
         (payment_number) => {
           const payment_start = DateTime.fromFormat(separation_date, DateFormat)
             .plus({ month: payment_number })
