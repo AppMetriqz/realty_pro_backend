@@ -66,6 +66,15 @@ export class ContactModel extends Model<ContactDto> {
   @Column({ type: DataType.STRING, allowNull: false })
   contact_method: string;
 
+  @Column({ type: DataType.STRING, defaultValue: null })
+  address: string;
+
+  @Column({ type: DataType.STRING, defaultValue: null })
+  workplace: string;
+
+  @Column({ type: DataType.STRING, defaultValue: null })
+  work_occupation: string;
+
   @Column({ type: DataType.DATE })
   date_of_birth: Date;
 

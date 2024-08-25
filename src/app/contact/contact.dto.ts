@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsEnum, ValidateIf, IsString } from 'class-validator';
+import { IsNotEmpty, IsEnum, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
 import { ContactType, ContactTypeEnumDto } from '../../common/constants';
 
 export class ContactDto {
   contact_id: number;
   type: string;
-  spouse_id: string;
+  spouse_id: number;
   first_name: string;
   last_name: string;
   email: string;
@@ -13,6 +13,9 @@ export class ContactDto {
   phone_number_2: string;
   national_id: string;
   nationality: string;
+  address: string;
+  workplace: string;
+  work_occupation: string;
   contact_method: string;
   date_of_birth: Date;
   marital_status: string;
@@ -25,13 +28,16 @@ export class ContactDto {
 export class CreateDto {
   contact_id: number;
   type: string;
-  spouse_id?: string;
+  spouse_id?: number;
   first_name: string;
   last_name: string;
   email: string;
   phone_number_1: string;
   phone_number_2?: string;
   national_id: string;
+  address?: string;
+  workplace?: string;
+  work_occupation?: string;
   nationality: string;
   contact_method: string;
   date_of_birth: Date;
@@ -45,7 +51,7 @@ export class CreateDto {
 export class UpdateDto {
   contact_id: number;
   type: string;
-  spouse_id: string;
+  spouse_id: number;
   first_name: string;
   last_name: string;
   email: string;
@@ -54,6 +60,9 @@ export class UpdateDto {
   national_id: string;
   nationality: string;
   contact_method: string;
+  address?: string;
+  workplace?: string;
+  work_occupation?: string;
   date_of_birth: Date;
   marital_status: string;
   notes: string;

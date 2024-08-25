@@ -155,6 +155,11 @@ export class ContactService {
     currentUser: CurrentUserDto;
   }) {
     body.create_by = currentUser.user_id;
+
+    if (body.spouse_id > 0) {
+      body.marital_status = 'married';
+    }
+
     return await this.model.create(body);
   }
 
@@ -170,11 +175,14 @@ export class ContactService {
     const model = await this.model.findByPk(id);
     if (!model) {
       return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
+        ...StatusCodes.NotFound,
       };
     }
+
+    if (body.spouse_id > 0) {
+      body.marital_status = 'married';
+    }
+
     body.update_by = currentUser.user_id;
     return model.update(body);
   }
