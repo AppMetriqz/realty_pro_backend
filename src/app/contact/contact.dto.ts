@@ -99,6 +99,11 @@ export class FindAllDto {
   @ValidateIf((o) => _.isString(o.dateFrom) && o.dateFrom !== '')
   @IsNotEmpty()
   dateTo: string;
+
+  @ValidateIf((o) => _.isString(o.type) && o.type !== '')
+  @IsEnum(ContactType)
+  @IsNotEmpty()
+  type: keyof typeof ContactTypeEnumDto;
 }
 
 export class FindAllPaymentPlansDto {

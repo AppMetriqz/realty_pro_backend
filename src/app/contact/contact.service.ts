@@ -35,9 +35,10 @@ export class ContactService {
     const sort_by = filters.sortBy;
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
+    const type = filters.type;
 
     let order = undefined;
-    const where: { created_at?: any } = {};
+    const where: { created_at?: any; type?: string } = {};
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];
@@ -45,6 +46,10 @@ export class ContactService {
 
     if (_.size(dateFrom) > 0 && _.size(dateTo) > 0) {
       where.created_at = { [Op.between]: [dateFrom, dateTo] };
+    }
+
+    if (_.size(type)) {
+      where.type = type;
     }
 
     return await this.model.findAndCountAll({
