@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsEnum, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsEnum, ValidateIf, IsArray } from 'class-validator';
 import * as _ from 'lodash';
 import { ContactType, ContactTypeEnumDto } from '../../common/constants';
+import { Transform } from 'class-transformer';
 
 export class ContactDto {
   contact_id: number;
@@ -100,10 +101,15 @@ export class FindAllDto {
   @IsNotEmpty()
   dateTo: string;
 
-  @ValidateIf((o) => _.isString(o.type) && o.type !== '')
-  @IsEnum(ContactType)
   @IsNotEmpty()
-  type: keyof typeof ContactTypeEnumDto;
+  @Transform((value) => _.split(value.value, ',').filter((v) => v !== ''))
+  @IsArray()
+  type: string[];
+
+  // @ValidateIf((o) => _.isString(o.type) && o.type !== '')
+  // @IsEnum(ContactType)
+  // @IsNotEmpty()
+  // type: keyof typeof ContactTypeEnumDto;
 }
 
 export class FindAllPaymentPlansDto {

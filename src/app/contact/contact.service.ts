@@ -38,7 +38,7 @@ export class ContactService {
     const type = filters.type;
 
     let order = undefined;
-    const where: { created_at?: any; type?: string } = {};
+    const where: { created_at?: any; type?: string[] } = {};
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];
