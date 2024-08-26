@@ -70,7 +70,7 @@ export class ContactService {
       include: [
         {
           model: ProjectModel,
-          attributes: ['project_id', 'name', 'description'],
+          attributes: ['project_id', 'name', 'description', 'currency_type'],
         },
         {
           model: UnitModel,
