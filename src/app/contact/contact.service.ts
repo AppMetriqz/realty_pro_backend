@@ -65,7 +65,7 @@ export class ContactService {
 
     const where: { status?: string } = {};
 
-    if (status === 'financed') {
+    if (status === 'finished') {
       where.status = 'financed';
     }
 

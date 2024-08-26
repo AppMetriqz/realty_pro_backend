@@ -306,4 +306,37 @@ export class SaleService {
       Sale: this.model,
     });
   }
+
+  async removeResale({
+    id,
+    body,
+    currentUser,
+  }: {
+    id: number;
+    body: DeleteDto;
+    currentUser: CurrentUserDto;
+  }) {
+    const model = await this.model.findByPk(id);
+    if (!model || !model.is_active) {
+      return {
+        ...StatusCodes.NotFound,
+      };
+    }
+
+    return await onFullCancellation({
+      isPaymentDelete: false,
+      notes: body.notes,
+      user_id: currentUser.user_id,
+      sequelize: this.sequelize,
+      Notification: this.Notification,
+      PaymentPlan: this.PaymentPlan,
+      PaymentPlanDetail: this.PaymentPlanDetail,
+      Payment: this.Payment,
+      Project: this.Project,
+      Unit: this.unit,
+      sale_id: model.sale_id,
+      isSale: true,
+      Sale: this.model,
+    });
+  }
 }

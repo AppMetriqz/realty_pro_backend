@@ -100,4 +100,25 @@ export class SaleController {
     }
     return message;
   }
+
+  @Delete('re-sale/:id')
+  @UseFilters(new HttpExceptionFilter())
+  async removeResale(
+    @Param('id') id: number,
+    @Body() body: DeleteDto,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ) {
+    const response: unknown = await this.service.removeResale({
+      id,
+      body,
+      currentUser,
+    });
+    const error = response as ExceptionDto;
+    const message = response as { message: string };
+
+    if (_.isNumber(error?.statusCode)) {
+      return new CatchException().Error(error);
+    }
+    return message;
+  }
 }

@@ -114,7 +114,7 @@ export class FindAllDto {
 
 export class FindAllPaymentPlansDto {
   @IsNotEmpty()
-  @IsEnum(['active', 'financed'])
+  @IsEnum(['sales', 'finished'])
   status: string;
 }
 
