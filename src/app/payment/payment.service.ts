@@ -12,6 +12,7 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { SaleModel } from '../sale/sale.model';
 import { LoggerModel } from '../logger/logger.model';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class PaymentService {
@@ -196,7 +197,10 @@ export class PaymentService {
         const amount_paid_model = _.toNumber(Plan.amount_paid);
         const payment_amount_model = _.toNumber(Plan.payment_amount);
         if (amount_paid_model >= payment_amount_model) {
-          await Plan.update({ status: 'paid' }, { transaction });
+          await Plan.update(
+            { status: 'paid', paid_at: new Date() },
+            { transaction },
+          );
         }
       }
 

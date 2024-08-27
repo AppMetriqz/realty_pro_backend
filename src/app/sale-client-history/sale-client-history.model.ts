@@ -34,6 +34,15 @@ export class SaleClientHistoryModel extends Model<SaleClientHistoryDto> {
   @BelongsTo(() => ContactModel, 'client_id')
   client: ContactModel;
 
+  @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
+  total_amount: number;
+
+  @Column({
+    type: DataType.ENUM('sale', 'resale'),
+    defaultValue: 'sale',
+  })
+  sale_type: string;
+
   @Column({ type: DataType.STRING, defaultValue: null })
   notes: string;
 

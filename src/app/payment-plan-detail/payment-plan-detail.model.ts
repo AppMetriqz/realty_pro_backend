@@ -66,6 +66,9 @@ export class PaymentPlanDetailModel extends Model<PaymentPlanDetailDto> {
   @Column({ type: DataType.DATEONLY, allowNull: false })
   payment_date: string;
 
+  @Column({ type: DataType.DATE, defaultValue: null })
+  paid_at: Date;
+
   @Column({
     type: DataType.ENUM('pending', 'paid', 'resold', 'financed', 'canceled'),
     defaultValue: 'pending',

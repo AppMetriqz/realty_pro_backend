@@ -272,6 +272,14 @@ export class PaymentPlanService {
       };
     }
 
+    if (sale.client_id === 1 && !body.is_resale) {
+      return {
+        ...StatusCodes.BadRequest,
+        message:
+          'Debe asignar un cliente a la venta antes de crear un plan de pago.',
+      };
+    }
+
     const is_resale = body.is_resale;
     const total_amount = is_resale ? body.total_amount : sale.price;
     const client_id = is_resale ? body.client_id : null;
@@ -390,6 +398,8 @@ export class PaymentPlanService {
           {
             sale_id: sale.sale_id,
             client_id: client_id,
+            sale_type: 'resale',
+            total_amount: body.total_amount,
           },
           { transaction, ignoreDuplicates: true },
         );
@@ -418,6 +428,17 @@ export class PaymentPlanService {
           Notification: this.Notification,
           dateFormat: DateFormat,
         });
+
+        await this.SaleClientHistory.update(
+          { client_id: sale.client_id },
+          {
+            where: {
+              sale_id: sale.sale_id,
+              sale_type: 'sale',
+            },
+            transaction,
+          },
+        );
       }
 
       return payment_plan;

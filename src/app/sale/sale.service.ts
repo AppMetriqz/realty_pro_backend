@@ -24,6 +24,7 @@ import { WhereOperators } from 'sequelize/types/model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
 import { ProjectModel } from '../project/project.model';
+import { CreateDto as NotificationCreateDto } from '../notification/notification.dto';
 
 @Injectable()
 export class SaleService {
@@ -183,6 +184,8 @@ export class SaleService {
         {
           sale_id: sale.sale_id,
           client_id: body.client_id,
+          sale_type: 'sale',
+          total_amount: sale.price,
         },
         { transaction },
       );
@@ -323,20 +326,92 @@ export class SaleService {
       };
     }
 
-    return await onFullCancellation({
-      isPaymentDelete: false,
-      notes: body.notes,
-      user_id: currentUser.user_id,
-      sequelize: this.sequelize,
-      Notification: this.Notification,
-      PaymentPlan: this.PaymentPlan,
-      PaymentPlanDetail: this.PaymentPlanDetail,
-      Payment: this.Payment,
-      Project: this.Project,
-      Unit: this.unit,
-      sale_id: model.sale_id,
-      isSale: true,
-      Sale: this.model,
+    const notes = body.notes;
+
+    let status = '';
+
+    if (model.stage === 'payment_plan_in_progress') {
+      status = 'pending';
+    } else if (model.stage === 'payment_plan_completed') {
+      status = 'paid';
+    } else if (model.stage === 'payment_plan_completed') {
+      status = 'financed';
+    }
+
+    const clientBefore = await this.SaleClientHistory.findOne({
+      where: {
+        sale_id: model.sale_id,
+        sale_type: 'sale',
+      },
+    });
+
+    return await this.sequelize.transaction(async (transaction) => {
+      await model.update({
+        client_id: clientBefore.client_id,
+      });
+
+      await this.PaymentPlan.update(
+        {
+          status: status,
+        },
+        {
+          where: {
+            sale_id: model.sale_id,
+            sale_type: 'sale',
+          },
+          transaction,
+        },
+      );
+
+      await this.PaymentPlanDetail.update(
+        {
+          status: status,
+        },
+        {
+          where: {
+            sale_id: model.sale_id,
+            sale_type: 'sale',
+          },
+          transaction,
+        },
+      );
+
+      await this.SaleClientHistory.destroy({
+        where: {
+          sale_id: model.sale_id,
+          sale_type: 'resale',
+        },
+        transaction,
+      });
+
+      await this.PaymentPlanDetail.destroy({
+        where: {
+          sale_id: model.sale_id,
+          sale_type: 'resale',
+        },
+        transaction,
+      });
+
+      await this.PaymentPlan.destroy({
+        where: {
+          sale_id: model.sale_id,
+          sale_type: 'resale',
+        },
+        transaction,
+      });
+
+      const notifications: NotificationCreateDto = {
+        name: 'Cancelacion Reventa',
+        description: notes,
+        notification_type: 'sales',
+        notification_type_id: model.sale_id,
+        notification_date: new Date().toLocaleDateString(),
+        isNotes: true,
+        create_by: currentUser.user_id,
+      };
+      await this.Notification.create(notifications, { transaction });
+
+      return model;
     });
   }
 }

@@ -5,6 +5,8 @@ export class SaleClientHistoryDto {
   sale_history_id: number;
   sale_id: number;
   client_id: number;
+  total_amount: number;
+  sale_type: string;
   notes: string;
   is_active: boolean;
   create_by: number;
