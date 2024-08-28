@@ -106,6 +106,8 @@ export class ContactService {
             'payment_date',
             'sale_type',
             'status',
+            'updated_at',
+            'paid_at',
           ],
         },
       ],

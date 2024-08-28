@@ -39,8 +39,11 @@ export class UnitModel extends Model<UnitDto> {
   @Column({ type: DataType.STRING, defaultValue: null })
   description: string;
 
-  @Column({ type: DataType.STRING, defaultValue: null })
-  notes: string;
+  @Column({
+    type: DataType.ENUM(...UnitStatus),
+    allowNull: false,
+  })
+  status: string;
 
   @Column({
     type: DataType.ENUM(...PropertyType),
@@ -87,11 +90,8 @@ export class UnitModel extends Model<UnitDto> {
   @Column({ type: DataType.INTEGER, defaultValue: null })
   cover_size: number;
 
-  @Column({
-    type: DataType.ENUM(...UnitStatus),
-    allowNull: false,
-  })
-  status: string;
+  @Column({ type: DataType.STRING, defaultValue: null })
+  notes: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   is_active: boolean;
