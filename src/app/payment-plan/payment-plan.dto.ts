@@ -20,6 +20,7 @@ export class PaymentPlanDto {
   separation_date: string;
   payment_plan_numbers: number;
   separation_rate: number;
+  total_amount: number;
   status: string;
   notes: string;
   is_active: boolean;

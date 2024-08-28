@@ -19,6 +19,7 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { SaleModel } from '../sale/sale.model';
 import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class ContactService {
@@ -69,9 +70,26 @@ export class ContactService {
       where.status = 'financed';
     }
 
-    return await this.PaymentPlan.findAll({
+    const paymentsPlan = await this.PaymentPlan.findAll({
+      nest: true,
+      raw: true,
       order: [['payment_plan_id', 'DESC']],
       where: { ...where },
+      attributes: [
+        ..._.keys(this.PaymentPlan.getAttributes()),
+        [
+          Sequelize.literal(
+            '(SELECT Sum(payment_amount) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = payment_plan.payment_plan_id)',
+          ),
+          'total_payment_amount',
+        ],
+        [
+          Sequelize.literal(
+            '(SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = payment_plan.payment_plan_id)',
+          ),
+          'total_amount_paid',
+        ],
+      ],
       include: [
         {
           model: ProjectModel,
@@ -112,6 +130,22 @@ export class ContactService {
         },
       ],
     });
+
+    return paymentsPlan.map(
+      (item: PaymentPlanModel & { total_amount_paid: number }) => {
+        const total_amount = _.toNumber(item.total_amount);
+
+        const total_amount_paid =
+          _.toNumber(item.total_amount_paid) +
+          _.toNumber(item.separation_amount);
+
+        const total_financing = total_amount - total_amount_paid;
+        return {
+          total_financing,
+          ...item,
+        };
+      },
+    );
   }
 
   async findAllAutocomplete(filters: FindAllAutocompleteDto) {

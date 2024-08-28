@@ -16,8 +16,8 @@ import { PaymentPlanDetailDto } from '../payment-plan-detail/payment-plan-detail
 import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
 
-@Table({ tableName: 'payment_plans' })
-export class PaymentPlanModel extends Model<PaymentPlanDto> {
+@Table({ tableName: 'payment_plans', modelName: 'payment_plan' })
+export class PaymentPlanModel extends Model<PaymentPlanDto, PaymentPlanDto> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.INTEGER })

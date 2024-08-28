@@ -16,7 +16,6 @@ import { CurrentUserDto } from '../../common/dto';
 import { ProjectPropertyFeaturesDto } from '../project-property-features/project-property-features.dto';
 import { ProjectPropertyFeaturesModel } from '../project-property-features/project-property-features.model';
 import * as fs from 'fs-extra';
-import { ModelProperties } from './project.core';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { UnitModel } from '../unit/unit.model';
 import { PropertyFeaturesModel } from '../property-features/property-features.model';
