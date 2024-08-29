@@ -10,6 +10,7 @@ export class PaymentPlanDetailDto {
   amount_paid: number;
   payment_date: string;
   paid_at: Date;
+  payment_made_at: Date;
   status: string;
   notes: string;
   is_active: boolean;

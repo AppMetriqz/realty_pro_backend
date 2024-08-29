@@ -63,7 +63,7 @@ export class PaymentPlanModel extends Model<PaymentPlanDto, PaymentPlanDto> {
   separation_rate: number;
 
   @Column({
-    type: DataType.ENUM('pending', 'resold', 'paid', 'financed', 'canceled'),
+    type: DataType.ENUM('pending', 'resold', 'paid', 'canceled'),
     defaultValue: 'pending',
   })
   status: string;

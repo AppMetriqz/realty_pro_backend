@@ -60,7 +60,12 @@ export class CreateDto {
   cover_size: number;
   status: string;
 
-  @Transform((value) => _.map(_.split(value.value, ','), (n) => _.toNumber(n)))
+  @Transform((value) =>
+    _.map(
+      _.split(value.value, ',').filter((v) => v !== ''),
+      (n) => _.toNumber(n),
+    ),
+  )
   @IsArray()
   property_feature_ids: number[];
 
@@ -87,7 +92,12 @@ export class UpdateDto {
   cover_size: number;
   status: string;
 
-  @Transform((value) => _.map(_.split(value.value, ','), (n) => _.toNumber(n)))
+  @Transform((value) =>
+    _.map(
+      _.split(value.value, ',').filter((v) => v !== ''),
+      (n) => _.toNumber(n),
+    ),
+  )
   @IsArray()
   property_feature_ids: number[];
 

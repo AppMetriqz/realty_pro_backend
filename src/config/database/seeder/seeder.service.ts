@@ -68,9 +68,9 @@ export class SeederService {
       {
         contact_id: 2,
         type: 'seller',
-        first_name: 'seller',
-        last_name: 'seller',
-        email: 'seller@gmail.com',
+        first_name: 'Realty',
+        last_name: 'Dominicana',
+        email: 'realty@gmail.com',
         phone_number_1: '+18002003001',
         national_id: '2222222222',
         nationality: 'Dominicana',
@@ -92,7 +92,10 @@ export class SeederService {
         marital_status: 'single',
       },
     ];
-    return this.Contact.bulkCreate(array, { ignoreDuplicates: true });
+    return this.Contact.bulkCreate(array, {
+      ignoreDuplicates: true,
+      updateOnDuplicate: ['first_name', 'last_name', 'email'],
+    });
   }
 
   async createStatuses() {

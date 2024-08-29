@@ -170,19 +170,21 @@ export class UnitService {
       const property_feature_ids = body.property_feature_ids;
       const unit_id = model.unit_id;
 
-      const propertyFeatures: UnitPropertyFeaturesDto[] =
-        property_feature_ids.map((property_feature_id: number) => {
-          return {
-            property_feature_id: property_feature_id,
-            project_id: body.project_id,
-            unit_id: unit_id,
-          };
-        });
+      if (_.size(property_feature_ids) > 0) {
+        const propertyFeatures: UnitPropertyFeaturesDto[] =
+          property_feature_ids.map((property_feature_id: number) => {
+            return {
+              property_feature_id: property_feature_id,
+              project_id: body.project_id,
+              unit_id: unit_id,
+            };
+          });
 
-      await this.unitPropertyFeatures.bulkCreate(propertyFeatures, {
-        transaction,
-        ignoreDuplicates: true,
-      });
+        await this.unitPropertyFeatures.bulkCreate(propertyFeatures, {
+          transaction,
+          ignoreDuplicates: true,
+        });
+      }
 
       return model;
     });

@@ -130,6 +130,9 @@ export class PaymentService {
     const plan_payment_amount = _.toNumber(paymentPlanDetail.payment_amount);
 
     const amount_paid = body.amount;
+    const payment_made_at = body.payment_made_at
+      ? body.payment_made_at
+      : new Date();
 
     return await this.sequelize.transaction(async (transaction) => {
       const values = {
@@ -139,6 +142,7 @@ export class PaymentService {
         sale_id: paymentPlan.sale_id,
         amount: amount_paid,
         create_by: currentUser.user_id,
+        payment_made_at: payment_made_at,
       };
 
       const payment = await this.model.create(values, { transaction });
@@ -192,7 +196,10 @@ export class PaymentService {
         const plan_detail_id = installment.payment_plan_detail_id;
         const payment_amount = amounts_plan[i];
         const Plan = await this.PaymentPlanDetail.findByPk(plan_detail_id);
+
         await Plan.increment({ amount_paid: payment_amount });
+        await Plan.update({ payment_made_at: payment_made_at });
+
         await Plan.reload();
         const amount_paid_model = _.toNumber(Plan.amount_paid);
         const payment_amount_model = _.toNumber(Plan.payment_amount);

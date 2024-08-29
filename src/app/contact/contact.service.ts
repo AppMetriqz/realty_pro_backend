@@ -126,6 +126,7 @@ export class ContactService {
             'status',
             'updated_at',
             'paid_at',
+            'payment_made_at',
           ],
         },
       ],

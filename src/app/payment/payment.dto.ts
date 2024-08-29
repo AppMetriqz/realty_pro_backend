@@ -9,6 +9,7 @@ export class PaymentDto {
   sale_id: number;
   amount: number;
   notes: string;
+  payment_made_at: Date;
   status: string;
   is_active: boolean;
   create_by: number;
@@ -23,6 +24,7 @@ export class CreateDto {
   @IsNotEmpty()
   amount: number;
 
+  payment_made_at?: Date;
   notes?: string;
 }
 

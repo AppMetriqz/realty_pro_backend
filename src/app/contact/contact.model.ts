@@ -44,26 +44,26 @@ export class ContactModel extends Model<ContactDto> {
   @Column({ type: DataType.STRING, allowNull: false })
   first_name: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   last_name: string;
 
   @IsEmail
   @Column({ type: DataType.STRING, allowNull: false })
   email: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   phone_number_1: string;
 
   @Column({ type: DataType.STRING, defaultValue: null })
   phone_number_2: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null})
   national_id: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   nationality: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   contact_method: string;
 
   @Column({ type: DataType.STRING, defaultValue: null })
