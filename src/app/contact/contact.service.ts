@@ -71,8 +71,8 @@ export class ContactService {
     }
 
     const paymentsPlan = await this.PaymentPlan.findAll({
-      nest: true,
-      raw: true,
+      // nest: true,
+      // raw: true,
       order: [['payment_plan_id', 'DESC']],
       where: { ...where },
       attributes: [
@@ -131,7 +131,24 @@ export class ContactService {
       ],
     });
 
-    return paymentsPlan.map(
+    function removeCircularReferences(obj: any) {
+      const seen = new WeakSet();
+      return JSON.parse(
+        JSON.stringify(obj, (key, value) => {
+          if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+              return;
+            }
+            seen.add(value);
+          }
+          return value;
+        }),
+      );
+    }
+
+    const sanitizedPaymentsPlan = removeCircularReferences(paymentsPlan);
+
+    return sanitizedPaymentsPlan.map(
       (item: PaymentPlanModel & { total_amount_paid: number }) => {
         const total_amount = _.toNumber(item.total_amount);
 
