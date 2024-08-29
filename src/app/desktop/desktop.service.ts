@@ -124,6 +124,18 @@ export class DesktopService {
           order: [['unit_id', 'ASC']],
           attributes: ['unit_id', 'name', 'description'],
         },
+        {
+          model: ContactModel,
+          as: 'client',
+          order: [['first_name', 'ASC']],
+          attributes: ['contact_id', 'first_name', 'last_name'],
+        },
+        {
+          model: ContactModel,
+          as: 'seller',
+          order: [['first_name', 'ASC']],
+          attributes: ['contact_id', 'first_name', 'last_name'],
+        },
       ],
       order: [[UnitModel, 'name', 'ASC']],
     });
@@ -155,6 +167,12 @@ export class DesktopService {
         {
           model: ContactModel,
           as: 'client',
+          order: [['first_name', 'ASC']],
+          attributes: ['contact_id', 'first_name', 'last_name'],
+        },
+        {
+          model: ContactModel,
+          as: 'seller',
           order: [['first_name', 'ASC']],
           attributes: ['contact_id', 'first_name', 'last_name'],
         },
