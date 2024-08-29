@@ -248,6 +248,8 @@ export class SaleService {
             {
               sale_id: sale.sale_id,
               client_id: body.client_id,
+              sale_type: 'sale',
+              total_amount: sale.price,
             },
             { transaction },
           );

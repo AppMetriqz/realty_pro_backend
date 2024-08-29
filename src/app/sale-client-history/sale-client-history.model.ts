@@ -34,7 +34,7 @@ export class SaleClientHistoryModel extends Model<SaleClientHistoryDto> {
   @BelongsTo(() => ContactModel, 'client_id')
   client: ContactModel;
 
-  @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
+  @Column({ type: DataType.DECIMAL(10, 2), allowNull: true })
   total_amount: number;
 
   @Column({
