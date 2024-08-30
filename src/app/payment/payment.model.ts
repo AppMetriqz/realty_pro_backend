@@ -48,7 +48,7 @@ export class PaymentModel extends Model<PaymentDto> {
   @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
   amount: number;
 
-  @Column({ type: DataType.DATE, defaultValue: null })
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
   payment_made_at: Date;
 
   @Column({

@@ -45,10 +45,10 @@ export class UserModel extends Model<UserDto> {
   @Column({ type: DataType.STRING, allowNull: false })
   last_name: string;
 
-  @Column({ type: DataType.STRING })
+  @Column({ type: DataType.STRING, allowNull: true })
   phone_number: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: true })
   national_id: string;
 
   @IsEmail
