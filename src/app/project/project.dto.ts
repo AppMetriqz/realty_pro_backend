@@ -125,4 +125,7 @@ export class FindAllAutocompleteDto {
   @ValidateIf((o) => _.isString(o.currencyType) && o.currencyType !== '')
   @IsEnum(['US', 'RD'])
   currencyType: string;
+
+  @Transform(({ value }) => _.toNumber(value))
+  limit: number;
 }

@@ -378,6 +378,7 @@ export class ProjectService {
   async findAllAutocomplete(filters: FindAllAutocompleteDto) {
     const description = filters.description;
     const currencyType = filters.currencyType;
+    const limit = filters.limit;
 
     const where: { currency_type?: string } = {};
 
@@ -386,7 +387,7 @@ export class ProjectService {
     }
 
     return await this.model.findAll({
-      limit: 10,
+      limit: limit ?? 10,
       order: [['name', 'ASC']],
       where: {
         ...where,
