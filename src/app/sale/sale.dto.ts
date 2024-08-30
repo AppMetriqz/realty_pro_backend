@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsEnum, ValidateIf, IsArray } from 'class-validator';
 import * as _ from 'lodash';
-import { StageStatus } from '../../common/constants';
 import { Transform } from 'class-transformer';
 import { ContactDto } from '../contact/contact.dto';
 
@@ -14,6 +13,7 @@ export class SaleDto {
   commission: number;
   amount_pending_sale?: number;
   notes: string;
+  financed_at?: Date;
   stage: string;
   is_active: boolean;
   create_by: number;
@@ -70,6 +70,7 @@ export class UpdateDto {
   price: number;
   commission: number;
   stage: string;
+  financed_at?: Date;
   notes: string;
   update_by: number;
 }

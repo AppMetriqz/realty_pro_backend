@@ -1,19 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SaleModel } from './sale.model';
 import { InjectModel } from '@nestjs/sequelize';
-import {
-  CreateAllDto,
-  CreateDto,
-  DeleteDto,
-  FindAllDto,
-  UpdateDto,
-} from './sale.dto';
+import { CreateAllDto, CreateDto, DeleteDto, FindAllDto, UpdateDto } from './sale.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { StatusCodes } from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
 import { UnitModel } from '../unit/unit.model';
-import { ModelProperties, createNotifications } from './sale.core';
+import { createNotifications, ModelProperties } from './sale.core';
 import { NotificationModel } from '../notification/notification.model';
 import { Sequelize } from 'sequelize-typescript';
 import { ContactModel } from '../contact/contact.model';
@@ -100,38 +94,33 @@ export class SaleService {
       };
     }
 
-    let amount_pending_sale = null;
+    // let amount_pending_sale = null;
 
-    const PaymentPlan = await this.PaymentPlan.findOne({
-      where: { sale_id: model.sale_id },
-    });
+    // const PaymentPlan = await this.PaymentPlan.findOne({
+    //   where: { sale_id: model.sale_id },
+    // });
 
-    if (PaymentPlan) {
-      const where = {
-        payment_plan_id: PaymentPlan.payment_plan_id,
-      };
+    // if (PaymentPlan) {
+    //   const where = {
+    //     payment_plan_id: PaymentPlan.payment_plan_id,
+    //   };
+    //
+    //   const total_amount_paid = await this.PaymentPlanDetail.sum(
+    //     'amount_paid',
+    //     {
+    //       where: where,
+    //     },
+    //   );
+    //
+    //   const total_payment_amount = await this.PaymentPlanDetail.sum(
+    //     'payment_amount',
+    //     { where: where },
+    //   );
+    //
+    //   amount_pending_sale = total_payment_amount - total_amount_paid;
+    // }
 
-      const total_amount_paid = await this.PaymentPlanDetail.sum(
-        'amount_paid',
-        {
-          where: where,
-        },
-      );
-
-      const total_payment_amount = await this.PaymentPlanDetail.sum(
-        'payment_amount',
-        { where: where },
-      );
-
-      amount_pending_sale = total_payment_amount - total_amount_paid;
-    }
-
-    const data = model.get({ plain: true });
-
-    return {
-      ...data,
-      amount_pending_sale,
-    };
+    return model.get({ plain: true })
   }
 
   async create({
@@ -275,6 +264,10 @@ export class SaleService {
       };
     }
     body.update_by = currentUser.user_id;
+
+    if (body.stage ==='financed'){
+      body.financed_at = new Date()
+    }
 
     return model.update(body);
   }

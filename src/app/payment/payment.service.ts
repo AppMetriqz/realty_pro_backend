@@ -180,6 +180,7 @@ export class PaymentService {
         _.take(amounts_plan, total_plan_pending),
         _.drop(amounts_plan, total_plan_pending),
       ];
+
       const credit_last_paid = _.sum(amounts_to_credit);
       const lastIndex = amounts_to_paid.length - 1;
       const last_plan_amount = _.last(amounts_to_paid) + credit_last_paid;
@@ -199,6 +200,10 @@ export class PaymentService {
 
         await Plan.increment({ amount_paid: payment_amount });
         await Plan.update({ payment_made_at: payment_made_at });
+
+        if (total_amount_remaining > 0 && i === 0) {
+          await Plan.update({ payout: total_amount_remaining });
+        }
 
         await Plan.reload();
         const amount_paid_model = _.toNumber(Plan.amount_paid);

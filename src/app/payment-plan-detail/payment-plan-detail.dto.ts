@@ -8,6 +8,7 @@ export class PaymentPlanDetailDto {
   payment_amount: number;
   payment_number: number;
   amount_paid: number;
+  payout: number;
   payment_date: string;
   paid_at: Date;
   payment_made_at: Date;

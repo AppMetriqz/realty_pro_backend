@@ -101,7 +101,7 @@ export class ContactService {
         },
         {
           model: SaleModel,
-          attributes: ['sale_id', 'price', 'commission', 'stage'],
+          attributes: ['sale_id', 'price', 'commission', 'stage', 'financed_at'],
           include: [
             {
               model: ContactModel,
@@ -120,6 +120,7 @@ export class ContactService {
           attributes: [
             'payment_amount',
             'amount_paid',
+            'payout',
             'payment_number',
             'payment_date',
             'sale_type',

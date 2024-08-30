@@ -59,6 +59,9 @@ export class SaleModel extends Model<SaleDto> {
   @Column({ type: DataType.STRING, defaultValue: null })
   notes: string;
 
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
+  financed_at: Date;
+
   @Column({
     type: DataType.ENUM(...StageStatus),
     defaultValue: 'separation',
