@@ -75,7 +75,7 @@ export class ContactModel extends Model<ContactDto> {
   @Column({ type: DataType.STRING, defaultValue: null })
   work_occupation: string;
 
-  @Column({ type: DataType.DATE })
+  @Column({ type: DataType.DATEONLY })
   date_of_birth: Date;
 
   @Column({ type: DataType.ENUM(...MaritalStatuses), defaultValue: null })
