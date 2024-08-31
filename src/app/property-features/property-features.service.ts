@@ -3,11 +3,7 @@ import { PropertyFeaturesModel } from './property-features.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { CurrentUserDto } from '../../common/dto';
 import { StatusCodes } from '../../common/constants';
-import {
-  FindAllDto,
-  CreateDto,
-  UpdateDto,
-} from './property-features.dto';
+import { FindAllDto, CreateDto, UpdateDto } from './property-features.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 
@@ -28,7 +24,9 @@ export class PropertyFeaturesService {
     const type = filters.type;
 
     let order = undefined;
-    const where: { created_at?: any; type?: any } = {};
+    const where: { created_at?: any; type?: any; is_active: boolean } = {
+      is_active: true,
+    };
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];

@@ -14,9 +14,7 @@ export class PropertyFeaturesDto {
 export class CreateDto {
   description: string;
   type: string;
-  is_active: boolean;
   create_by: number;
-  update_by: number;
 }
 
 export class UpdateDto {

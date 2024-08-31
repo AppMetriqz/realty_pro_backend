@@ -95,9 +95,6 @@ export class PaymentPlanService {
         };
         where.status = 'pending';
         break;
-      case 'financing_payment':
-        where.status = 'paid';
-        break;
     }
 
     const result = await this.PaymentPlanDetail.findAndCountAll({
@@ -162,6 +159,110 @@ export class PaymentPlanService {
         unit,
         client,
         remaining_time,
+      };
+    });
+
+    return {
+      count: result.count,
+      rows,
+    };
+  }
+
+  async findAllFinancing(filters: FindAllDto) {
+    const offset = _.toNumber(filters.pageIndex) * _.toNumber(filters.pageSize);
+    const limit = _.toNumber(filters.pageSize);
+    const sort_order = filters.sortOrder;
+    const sort_by = filters.sortBy;
+    const dateFrom = filters.dateFrom;
+    const dateTo = filters.dateTo;
+
+    let order = undefined;
+    const projectIds = filters.projectIds;
+
+    const today = DateTime.now().setZone('America/Santo_Domingo');
+
+    const where: {
+      is_active: boolean;
+      project_id: WhereOperators;
+      status?: string;
+      created_at?: WhereOperators;
+      payment_date?: WhereOperators;
+    } = {
+      is_active: true,
+      project_id: {
+        [Op.in]: projectIds,
+      },
+    };
+
+    if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
+      order = [[sort_by, sort_order]];
+    }
+
+    if (_.size(dateFrom) > 0 && _.size(dateTo) > 0) {
+      where.created_at = { [Op.between]: [dateFrom, dateTo] };
+    }
+
+    const result = await this.model.findAndCountAll({
+      limit,
+      offset,
+      order,
+      where: {
+        status: 'paid',
+      },
+      attributes: [
+        ...Object.keys(this.model.getAttributes()),
+        [
+          Sequelize.literal(
+            '(SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id  = payment_plan.payment_plan_id)',
+          ),
+          'total_amount_paid',
+        ],
+      ],
+      nest: true,
+      raw: true,
+      include: [
+        {
+          model: ProjectModel,
+          attributes: ['project_id', 'name', 'currency_type'],
+        },
+        {
+          model: UnitModel,
+          attributes: ['unit_id', 'name'],
+        },
+        {
+          model: SaleModel,
+          attributes: ['sale_id', 'stage'],
+          include: [
+            {
+              model: ContactModel,
+              as: 'client',
+              attributes: [
+                'contact_id',
+                'first_name',
+                'last_name',
+                'phone_number_1',
+              ],
+              order,
+            },
+          ],
+        },
+      ],
+    });
+
+    const rows = result.rows.map((result) => {
+      const targetDate = DateTime.fromFormat(result.paid_at, DateFormat);
+      const remaining_time = targetDate
+        .diff(today, ['days', 'hours'])
+        .toObject();
+
+      const sale = _.get(result, 'sale', null);
+      const client = _.get(sale, 'client', null);
+
+      return {
+        ...result,
+        remaining_time,
+        sale: _.omit(sale, 'client'),
+        client,
       };
     });
 

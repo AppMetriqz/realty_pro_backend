@@ -222,7 +222,10 @@ export class PaymentService {
       });
 
       if (planCount === 0) {
-        await paymentPlan.update({ status: 'paid' }, { transaction });
+        await paymentPlan.update(
+          { status: 'paid', paid_at: new Date() },
+          { transaction },
+        );
         await this.Sale.update(
           { stage: 'payment_plan_completed' },
           { where: { sale_id: paymentPlan.sale_id }, transaction },

@@ -68,6 +68,9 @@ export class PaymentPlanModel extends Model<PaymentPlanDto, PaymentPlanDto> {
   })
   status: string;
 
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
+  paid_at: string;
+
   @Column({ type: DataType.STRING, defaultValue: null })
   notes: string;
 

@@ -102,6 +102,7 @@ export class ContactService {
         {
           model: SaleModel,
           attributes: ['sale_id', 'price', 'commission', 'stage', 'financed_at'],
+          required: true,
           include: [
             {
               model: ContactModel,

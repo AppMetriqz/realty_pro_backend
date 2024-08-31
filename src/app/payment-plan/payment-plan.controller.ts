@@ -32,6 +32,12 @@ export class PaymentPlanController {
     return this.service.findAll(filters);
   }
 
+  @Get('financing')
+  @UseFilters(new HttpExceptionFilter())
+  findAllFinancing(@Query() filters: FindAllDto) {
+    return this.service.findAllFinancing(filters);
+  }
+
   @Get('stats')
   @UseFilters(new HttpExceptionFilter())
   findAllStats(@Query() filters: FindStatsDto) {

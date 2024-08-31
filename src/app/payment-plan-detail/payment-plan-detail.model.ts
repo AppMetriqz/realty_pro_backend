@@ -69,7 +69,7 @@ export class PaymentPlanDetailModel extends Model<PaymentPlanDetailDto> {
   @Column({ type: DataType.DATEONLY, allowNull: false })
   payment_date: string;
 
-  @Column({ type: DataType.DATE, defaultValue: null })
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
   paid_at: Date;
 
   @Column({ type: DataType.DATEONLY, defaultValue: null })

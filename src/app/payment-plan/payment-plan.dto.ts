@@ -22,6 +22,7 @@ export class PaymentPlanDto {
   separation_rate: number;
   total_amount: number;
   status: string;
+  paid_at: Date;
   notes: string;
   is_active: boolean;
   create_by: number;
@@ -108,6 +109,7 @@ export class FindAllDto {
   @IsNotEmpty()
   dateTo: string;
 
+  @ValidateIf((o) => _.isString(o.PlanFilterStats) && o.PlanFilterStats !== '')
   @IsEnum(PlanFilterStats, {
     message:
       'filterBy must be one of the following values: ' +
