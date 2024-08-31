@@ -29,6 +29,12 @@ import { WhereOperators } from 'sequelize/types/model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
 
+type Total = {
+  qty: number;
+  payment_amount: number;
+  amount_paid: number;
+};
+
 @Injectable()
 export class PaymentPlanService {
   constructor(
@@ -280,8 +286,14 @@ export class PaymentPlanService {
       .toFormat(DateFormat);
 
     const promise1 = this.PaymentPlanDetail.findAll({
+      raw: true,
+      nest: true,
       attributes: [
-        [Sequelize.fn('SUM', Sequelize.col('payment_amount')), 'total'],
+        [
+          Sequelize.fn('SUM', Sequelize.col('payment_amount')),
+          'payment_amount',
+        ],
+        [Sequelize.fn('SUM', Sequelize.col('amount_paid')), 'amount_paid'],
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
@@ -296,8 +308,14 @@ export class PaymentPlanService {
     });
 
     const promise2 = this.PaymentPlanDetail.findAll({
+      raw: true,
+      nest: true,
       attributes: [
-        [Sequelize.fn('SUM', Sequelize.col('payment_amount')), 'total'],
+        [
+          Sequelize.fn('SUM', Sequelize.col('payment_amount')),
+          'payment_amount',
+        ],
+        [Sequelize.fn('SUM', Sequelize.col('amount_paid')), 'amount_paid'],
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
@@ -311,17 +329,20 @@ export class PaymentPlanService {
       },
     });
 
-    const promise3 = this.PaymentPlanDetail.findAll({
-      attributes: [
-        [Sequelize.fn('SUM', Sequelize.col('amount_paid')), 'total'],
-        [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
-      ],
+    const promise3 = this.model.findAll({
+      attributes: ['payment_plan_id'],
       where: {
+        status: 'paid',
         project_id: {
           [Op.in]: projectIds,
         },
-        status: 'paid',
       },
+      include: [
+        {
+          model: PaymentPlanDetailModel,
+          attributes: ['amount_paid'],
+        },
+      ],
     });
 
     const [overdue_payments, pending_payments, financing_payments] =
@@ -335,15 +356,40 @@ export class PaymentPlanService {
       pending_payments.status === 'fulfilled'
         ? _.head(pending_payments.value)
         : null;
+
     const financing_payments_value =
       financing_payments.status === 'fulfilled'
-        ? _.head(financing_payments.value)
+        ? financing_payments.value
         : null;
 
+    const total = financing_payments_value.reduce((total, plan) => {
+      const sumaPlan = plan.payment_plan_details.reduce(
+        (suma, detalle) => suma + _.toNumber(detalle.amount_paid),
+        0,
+      );
+      return total + sumaPlan;
+    }, 0);
+
+    const overdue_payments_total = overdue_payments_value as unknown as Total;
+    const pending_payments_total = pending_payments_value as unknown as Total;
+
     return {
-      overdue_payments: overdue_payments_value,
-      pending_payments: pending_payments_value,
-      financing_payments: financing_payments_value,
+      overdue_payments: {
+        total:
+          _.toNumber(overdue_payments_total.payment_amount) -
+          _.toNumber(overdue_payments_total.amount_paid),
+        qty: overdue_payments_total.qty,
+      },
+      pending_payments: {
+        total:
+          _.toNumber(pending_payments_total.payment_amount) -
+          _.toNumber(pending_payments_total.amount_paid),
+        qty: pending_payments_total.qty,
+      },
+      financing_payments: {
+        total,
+        qty: _.size(financing_payments_value),
+      },
     };
   }
 
