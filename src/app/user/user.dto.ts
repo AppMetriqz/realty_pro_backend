@@ -38,6 +38,7 @@ export class UpdateDto {
   first_name: string;
   last_name: string;
   phone_number: string;
+  password?: string;
   email: string;
   national_id: string;
   notes?: string;

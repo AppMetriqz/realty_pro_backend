@@ -148,8 +148,17 @@ export class UserService {
         message: StatusCodes.NotFound.message,
       };
     }
-    body.update_by = currentUser.user_id;
-    return model.update(body);
+
+    const values = { ...body };
+
+    if (_.size(body.password) > 0) {
+      values.password = new PasswordGuard().hashPassword(body.password);
+    } else {
+      delete values.password;
+    }
+
+    values.update_by = currentUser.user_id;
+    return model.update(values);
   }
 
   async remove({
