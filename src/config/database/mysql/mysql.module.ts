@@ -19,8 +19,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
         logging: false,
         ssl: true,
         sync: {
-          force: true, //TODO Remover en pro
-          // alter: true, //TODO Remover en pro
+          // force: true, //TODO Remover en pro
+          alter: true, //TODO Remover en pro
         },
         define: {
           createdAt: 'created_at',
