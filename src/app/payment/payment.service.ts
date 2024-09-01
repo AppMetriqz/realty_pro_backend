@@ -201,8 +201,8 @@ export class PaymentService {
         await Plan.increment({ amount_paid: payment_amount });
         await Plan.update({ payment_made_at: payment_made_at });
 
-        if (total_amount_remaining > 0 && i === 0) {
-          await Plan.update({ payout: total_amount_remaining });
+        if (amount_paid > 0 && i === 0) {
+          await Plan.update({ total_amount_paid: amount_paid });
         }
 
         await Plan.reload();

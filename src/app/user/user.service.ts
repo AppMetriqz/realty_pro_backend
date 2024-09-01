@@ -143,9 +143,7 @@ export class UserService {
     const model = await this.model.findByPk(id);
     if (!model) {
       return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
+        ...StatusCodes.NotFound,
       };
     }
 

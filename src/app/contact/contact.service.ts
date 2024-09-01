@@ -64,17 +64,17 @@ export class ContactService {
   async findAllPaymentPlans(id: number, filters: FindAllPaymentPlansDto) {
     const status = filters.status;
 
-    const where: { status?: string } = {};
+    const where: { stage?: string } = {};
 
     if (status === 'finished') {
-      where.status = 'financed';
+      where.stage = 'financed';
     }
 
     const paymentsPlan = await this.PaymentPlan.findAll({
       // nest: true,
       // raw: true,
       order: [['payment_plan_id', 'DESC']],
-      where: { ...where },
+      // where: { ...where },
       attributes: [
         ..._.keys(this.PaymentPlan.getAttributes()),
         [
@@ -101,7 +101,14 @@ export class ContactService {
         },
         {
           model: SaleModel,
-          attributes: ['sale_id', 'price', 'commission', 'stage', 'financed_at'],
+          where: { ...where },
+          attributes: [
+            'sale_id',
+            'price',
+            'commission',
+            'stage',
+            'financed_at',
+          ],
           required: true,
           include: [
             {
@@ -121,7 +128,7 @@ export class ContactService {
           attributes: [
             'payment_amount',
             'amount_paid',
-            'payout',
+            'total_amount_paid',
             'payment_number',
             'payment_date',
             'sale_type',
@@ -154,11 +161,9 @@ export class ContactService {
     return sanitizedPaymentsPlan.map(
       (item: PaymentPlanModel & { total_amount_paid: number }) => {
         const total_amount = _.toNumber(item.total_amount);
-
         const total_amount_paid =
           _.toNumber(item.total_amount_paid) +
           _.toNumber(item.separation_amount);
-
         const total_financing = total_amount - total_amount_paid;
         return {
           total_financing,

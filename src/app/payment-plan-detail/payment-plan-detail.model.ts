@@ -61,7 +61,7 @@ export class PaymentPlanDetailModel extends Model<PaymentPlanDetailDto> {
   amount_paid: number;
 
   @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
-  payout: number;
+  total_amount_paid: number;
 
   @Column({ type: DataType.INTEGER, allowNull: false })
   payment_number: number;
