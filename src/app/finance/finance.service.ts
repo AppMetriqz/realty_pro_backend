@@ -46,19 +46,9 @@ export class FinanceService {
       },
     );
 
-    const total_capacity_promise = this.PaymentPlanDetail.sum(
-      'payment_amount',
-      {
-        where: {
-          project_id: projectIds,
-          sale_type: 'sale',
-          status: { [Op.notIn]: ['canceled'] },
-          is_active: true,
-        },
-      },
-    );
-
     const available_promise = this.Unit.findAll({
+      raw: true,
+      nest: true,
       attributes: [
         [Sequelize.fn('sum', Sequelize.col('price')), 'amount'],
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
@@ -71,6 +61,8 @@ export class FinanceService {
     });
 
     const sold_promise = this.Unit.findAll({
+      raw: true,
+      nest: true,
       attributes: [
         [Sequelize.fn('sum', Sequelize.col('price')), 'amount'],
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
@@ -83,6 +75,8 @@ export class FinanceService {
     });
 
     const reserved_promise = this.Unit.findAll({
+      raw: true,
+      nest: true,
       attributes: [
         [Sequelize.fn('sum', Sequelize.col('price')), 'amount'],
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
@@ -95,6 +89,8 @@ export class FinanceService {
     });
 
     const sales_promise = this.Sale.findAll({
+      raw: true,
+      nest: true,
       attributes: [
         [Sequelize.fn('YEAR', Sequelize.col('created_at')), 'year'],
         [Sequelize.fn('MONTH', Sequelize.col('created_at')), 'month'],
@@ -113,6 +109,7 @@ export class FinanceService {
       where: {
         is_active: true,
         project_id: projectIds,
+        stage: 'separation',
       },
     });
 
@@ -123,6 +120,15 @@ export class FinanceService {
         sale_type: 'sale',
         is_active: true,
       },
+      include: [
+        {
+          required: true,
+          model: SaleModel,
+          where: {
+            stage: 'payment_plan_in_progress',
+          },
+        },
+      ],
     });
 
     const payment_plans_completed_promise = this.PaymentPlan.count({
@@ -132,21 +138,38 @@ export class FinanceService {
         sale_type: 'sale',
         is_active: true,
       },
+      include: [
+        {
+          required: true,
+          model: SaleModel,
+          where: {
+            stage: 'payment_plan_completed',
+          },
+        },
+      ],
     });
 
     const financed_promise = this.PaymentPlan.count({
       where: {
         project_id: projectIds,
-        status: 'financed',
+        status: 'paid',
         sale_type: 'sale',
         is_active: true,
       },
+      include: [
+        {
+          required: true,
+          model: SaleModel,
+          where: {
+            stage: 'financed',
+          },
+        },
+      ],
     });
 
     const [
       payments_received,
       pending_payments,
-      total_capacity,
       available_model,
       sold_model,
       reserved_model,
@@ -157,7 +180,6 @@ export class FinanceService {
     ] = await Promise.all([
       payments_received_promise,
       pending_payments_promise,
-      total_capacity_promise,
       available_promise,
       sold_promise,
       reserved_promise,
@@ -167,9 +189,24 @@ export class FinanceService {
       financed_promise,
     ]);
 
-    const available = _.head(available_model);
-    const sold = _.head(sold_model);
-    const reserved = _.head(reserved_model);
+    const available = _.head(available_model) as unknown as {
+      amount: number;
+      qty: number;
+    };
+    const sold = _.head(sold_model) as unknown as {
+      amount: number;
+      qty: number;
+    };
+    const reserved = _.head(reserved_model) as unknown as {
+      amount: number;
+      qty: number;
+    };
+
+    const available_amount = available.amount ?? 0;
+    const sold_amount = sold.amount ?? 0;
+    const reserved_amount = reserved.amount ?? 0;
+
+    const total_capacity = available_amount + sold_amount + reserved_amount;
 
     return {
       payments_received: payments_received ?? 0,
