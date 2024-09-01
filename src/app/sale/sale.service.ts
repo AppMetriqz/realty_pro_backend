@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SaleModel } from './sale.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateAllDto, CreateDto, DeleteDto, FindAllDto, UpdateDto } from './sale.dto';
+import {
+  CreateAllDto,
+  CreateDto,
+  DeleteDto,
+  FindAllDto,
+  UpdateDto,
+} from './sale.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { StatusCodes } from '../../common/constants';
@@ -120,7 +126,7 @@ export class SaleService {
     //   amount_pending_sale = total_payment_amount - total_amount_paid;
     // }
 
-    return model.get({ plain: true })
+    return model.get({ plain: true });
   }
 
   async create({
@@ -265,8 +271,8 @@ export class SaleService {
     }
     body.update_by = currentUser.user_id;
 
-    if (body.stage ==='financed'){
-      body.financed_at = new Date()
+    if (body.stage === 'financed') {
+      body.financed_at = new Date();
     }
 
     return model.update(body);

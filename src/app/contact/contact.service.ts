@@ -20,6 +20,7 @@ import { SaleModel } from '../sale/sale.model';
 import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
 import { Sequelize } from 'sequelize-typescript';
+import { WhereOperators } from 'sequelize/types/model';
 
 @Injectable()
 export class ContactService {
@@ -64,10 +65,12 @@ export class ContactService {
   async findAllPaymentPlans(id: number, filters: FindAllPaymentPlansDto) {
     const status = filters.status;
 
-    const where: { stage?: string } = {};
+    const where: { stage?: WhereOperators } = {};
 
-    if (status === 'finished') {
-      where.stage = 'financed';
+    if (status === 'financed') {
+      where.stage = { [Op.in]: ['financed'] };
+    } else {
+      where.stage = { [Op.notIn]: ['financed'] };
     }
 
     const paymentsPlan = await this.PaymentPlan.findAll({
