@@ -17,7 +17,7 @@ import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
 
 @Table({ tableName: 'payment_plans', modelName: 'payment_plan' })
-export class PaymentPlanModel extends Model<PaymentPlanDto, PaymentPlanDto> {
+export class PaymentPlanModel extends Model<PaymentPlanDto> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.INTEGER })
@@ -69,7 +69,7 @@ export class PaymentPlanModel extends Model<PaymentPlanDto, PaymentPlanDto> {
   status: string;
 
   @Column({ type: DataType.DATEONLY, defaultValue: null })
-  paid_at: string;
+  paid_at: string | Date;
 
   @Column({ type: DataType.STRING, defaultValue: null })
   notes: string;

@@ -21,8 +21,9 @@ export class PaymentPlanDto {
   payment_plan_numbers: number;
   separation_rate: number;
   total_amount: number;
+  total_amount_paid?: number;
   status: string;
-  paid_at: Date;
+  paid_at: string | Date;
   notes: string;
   is_active: boolean;
   create_by: number;

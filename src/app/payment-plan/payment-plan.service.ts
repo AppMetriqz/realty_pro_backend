@@ -6,6 +6,7 @@ import {
   DeleteDto,
   FindAllDto,
   FindStatsDto,
+  PaymentPlanDto,
 } from './payment-plan.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
@@ -255,8 +256,9 @@ export class PaymentPlanService {
       ],
     });
 
-    const rows = result.rows.map((result) => {
-      const targetDate = DateTime.fromFormat(result.paid_at, DateFormat);
+    const rows = result.rows.map((result: PaymentPlanDto) => {
+      const paid_at = result.paid_at as string;
+      const targetDate = DateTime.fromFormat(paid_at, DateFormat);
       const remaining_time = targetDate
         .diff(today, ['days', 'hours'])
         .toObject();
@@ -264,11 +266,21 @@ export class PaymentPlanService {
       const sale = _.get(result, 'sale', null);
       const client = _.get(sale, 'client', null);
 
+      const total_amount = _.toNumber(result.total_amount);
+      const total_amount_paid = _.toNumber(result.total_amount_paid);
+      const separation_amount = _.toNumber(result.separation_amount);
+
+      // TODO:Cambiar a monto a financiar
+      const total_amount_financed =
+        total_amount - (total_amount_paid + separation_amount);
+
       return {
         ...result,
         remaining_time,
         sale: _.omit(sale, 'client'),
         client,
+        total_amount_paid: total_amount_financed,
+        total_amount_financed,
       };
     });
 

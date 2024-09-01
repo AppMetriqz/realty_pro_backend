@@ -48,7 +48,7 @@ export class ContactModel extends Model<ContactDto> {
   last_name: string;
 
   @IsEmail
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   email: string;
 
   @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
