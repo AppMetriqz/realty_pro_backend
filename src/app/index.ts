@@ -17,3 +17,5 @@ export * from './sale-client-history/sale-client-history.module';
 export * from './finance/finance.module';
 export * from './desktop/desktop.module';
 export * from './logger/logger.module';
+
+export * from './view/unit-sale-plan-details/unit-sale-plan-details.module';

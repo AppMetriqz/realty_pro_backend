@@ -19,6 +19,7 @@ import {
   FinanceModule,
   DesktopModule,
   LoggerModule,
+  UnitSalePlanDetailsModule
 } from './app';
 import { ConfigurationModule, FileModule, MysqlModule } from './config';
 
@@ -46,6 +47,7 @@ import { ConfigurationModule, FileModule, MysqlModule } from './config';
     FinanceModule,
     DesktopModule,
     LoggerModule,
+    UnitSalePlanDetailsModule
   ],
 })
 export class AppModule {}

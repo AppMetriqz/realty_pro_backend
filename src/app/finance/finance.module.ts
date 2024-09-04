@@ -7,6 +7,7 @@ import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { UnitModel } from '../unit/unit.model';
 import { SaleModel } from '../sale/sale.model';
 import { ProjectModel } from '../project/project.model';
+import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProjectModel } from '../project/project.model';
       PaymentPlanDetailModel,
       UnitModel,
       SaleModel,
+      UnitSalePlanDetailsView,
     ]),
   ],
   controllers: [FinanceController],
