@@ -1,6 +1,17 @@
-import { IsNotEmpty, IsEnum, ValidateIf, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEnum,
+  ValidateIf,
+  IsArray,
+  IsEmail,
+} from 'class-validator';
 import * as _ from 'lodash';
-import { ContactType, ContactTypeEnumDto } from '../../common/constants';
+import {
+  ContactType,
+  ContactTypeEnumDto,
+  MaritalStatuses,
+  MaritalStatusesEnumDto,
+} from '../../common/constants';
 import { Transform } from 'class-transformer';
 
 export class ContactDto {
@@ -30,23 +41,44 @@ export class CreateDto {
   contact_id: number;
   type: string;
   spouse_id?: number;
+
   first_name: string;
+
   last_name: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
+  @ValidateIf((o) => !(_.isNull(o.email) || _.isUndefined(o.email)))
+  @IsEmail()
   email: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   phone_number_1: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   phone_number_2?: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   national_id: string;
+
   address?: string;
   workplace?: string;
   work_occupation?: string;
   nationality: string;
   contact_method: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   date_of_birth: Date;
-  marital_status: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
+  @ValidateIf(
+    (o) => !(_.isNull(o.marital_status) || _.isUndefined(o.marital_status)),
+  )
+  @IsEnum(MaritalStatuses, { each: true })
+  marital_status: keyof typeof MaritalStatusesEnumDto;
+
   notes?: string;
-  is_active?: boolean;
+
   create_by?: number;
-  update_by?: number;
 }
 
 export class UpdateDto {
@@ -55,20 +87,38 @@ export class UpdateDto {
   spouse_id: number;
   first_name: string;
   last_name: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
+  @ValidateIf((o) => !(_.isNull(o.email) || _.isUndefined(o.email)))
+  @IsEmail()
   email: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   phone_number_1: string;
-  phone_number_2: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
+  phone_number_2?: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   national_id: string;
-  nationality: string;
-  contact_method: string;
+
   address?: string;
   workplace?: string;
   work_occupation?: string;
+  nationality: string;
+  contact_method: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
   date_of_birth: Date;
-  marital_status: string;
+
+  @Transform(({ value }) => (_.isEmpty(value) ? null : value))
+  @ValidateIf(
+    (o) => !(_.isNull(o.marital_status) || _.isUndefined(o.marital_status)),
+  )
+  @IsEnum(MaritalStatuses, { each: true })
+  marital_status: keyof typeof MaritalStatusesEnumDto;
+
   notes: string;
-  is_active: boolean;
-  create_by: number;
   update_by: number;
 }
 

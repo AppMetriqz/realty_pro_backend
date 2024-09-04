@@ -57,7 +57,7 @@ export class ContactModel extends Model<ContactDto> {
   @Column({ type: DataType.STRING, defaultValue: null })
   phone_number_2: string;
 
-  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null})
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
   national_id: string;
 
   @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
@@ -75,7 +75,7 @@ export class ContactModel extends Model<ContactDto> {
   @Column({ type: DataType.STRING, defaultValue: null })
   work_occupation: string;
 
-  @Column({ type: DataType.DATEONLY })
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
   date_of_birth: Date;
 
   @Column({ type: DataType.ENUM(...MaritalStatuses), defaultValue: null })

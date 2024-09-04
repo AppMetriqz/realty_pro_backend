@@ -191,11 +191,11 @@ export class PaymentPlanService {
     const where: {
       is_active: boolean;
       project_id: WhereOperators;
-      status?: string;
+      status: string;
       created_at?: WhereOperators;
-      payment_date?: WhereOperators;
     } = {
       is_active: true,
+      status: 'paid',
       project_id: {
         [Op.in]: projectIds,
       },
@@ -214,7 +214,7 @@ export class PaymentPlanService {
       offset,
       order,
       where: {
-        status: 'paid',
+        ...where,
       },
       attributes: [
         ...Object.keys(this.model.getAttributes()),

@@ -27,6 +27,7 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { NotificationModel } from '../notification/notification.model';
 import { ModelProperties } from './unit.core';
 import { ContactModel } from '../contact/contact.model';
+import { SaleService } from '../sale/sale.service';
 
 @Injectable()
 export class UnitService {
@@ -44,6 +45,7 @@ export class UnitService {
     @InjectModel(NotificationModel)
     private readonly Notification: typeof NotificationModel,
     private sequelize: Sequelize,
+    private saleService: SaleService,
   ) {}
 
   async findAll(filters: FindAllDto) {
@@ -159,7 +161,7 @@ export class UnitService {
   }) {
     body.create_by = currentUser.user_id;
 
-    return await this.sequelize.transaction(async (transaction) => {
+    const unit = await this.sequelize.transaction(async (transaction) => {
       if (file) {
         body.cover_name = file.filename;
         body.cover_path = file.path;
@@ -185,9 +187,24 @@ export class UnitService {
           ignoreDuplicates: true,
         });
       }
-
       return model;
     });
+
+    if (body.status === 'sold') {
+      const sale = await this.saleService.create({
+        isCreateFromUnit: true,
+        currentUser,
+        body: {
+          project_id: body.project_id,
+          unit_id: unit.unit_id,
+          client_id: 1,
+          seller_id: 2,
+          commission: 0,
+        },
+      });
+      return { ...unit, sale };
+    }
+    return unit;
   }
 
   async update({

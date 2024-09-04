@@ -24,27 +24,39 @@ export class FinanceService {
   async findAll(filters: FindAllDto) {
     const projectIds = filters.projectIds;
 
-    const payments_received_promise = this.PaymentPlanDetail.sum(
-      'amount_paid',
-      {
-        where: {
-          project_id: projectIds,
-          status: { [Op.notIn]: ['canceled'] },
-          is_active: true,
-        },
+    const payments_received_promise = this.PaymentPlan.sum('total_amount', {
+      where: {
+        project_id: projectIds,
+        sale_type: 'sale',
+        status: 'paid',
+        is_active: true,
       },
-    );
+    });
 
-    const pending_payments_promise = this.PaymentPlanDetail.sum(
-      'payment_amount',
-      {
+    const total_pending_payments_plan_detail_promise =
+      this.PaymentPlanDetail.sum('payment_amount', {
         where: {
           project_id: projectIds,
           status: { [Op.in]: ['pending'] },
           is_active: true,
         },
+      });
+
+    // TODO: Mejorar haciendolo con una vista
+    const total_pending_payments_plan_promise = this.Unit.findAll({
+      attributes: ['unit_id', 'project_id', 'price', 'status'],
+      where: {
+        project_id: projectIds,
+        is_active: true,
       },
-    );
+      include: [
+        {
+          attributes: ['status', 'sale_type', 'total_amount', 'is_active'],
+          required: false,
+          model: PaymentPlanModel,
+        },
+      ],
+    });
 
     const available_promise = this.Unit.findAll({
       raw: true,
@@ -169,7 +181,7 @@ export class FinanceService {
 
     const [
       payments_received,
-      pending_payments,
+      total_pending_payments_plan_detail,
       available_model,
       sold_model,
       reserved_model,
@@ -177,9 +189,10 @@ export class FinanceService {
       payment_plans_in_progress,
       payment_plans_completed,
       financed,
+      total_pending_payments_plan,
     ] = await Promise.all([
       payments_received_promise,
-      pending_payments_promise,
+      total_pending_payments_plan_detail_promise,
       available_promise,
       sold_promise,
       reserved_promise,
@@ -187,6 +200,7 @@ export class FinanceService {
       payment_plans_in_progress_promise,
       payment_plans_completed_promise,
       financed_promise,
+      total_pending_payments_plan_promise,
     ]);
 
     const available = _.head(available_model) as unknown as {
@@ -208,6 +222,21 @@ export class FinanceService {
 
     const total_capacity = available_amount + sold_amount + reserved_amount;
 
+    const filterpending_payments_plan = total_pending_payments_plan.filter(
+      (item) =>
+        item.payment_plan[0]?.status !== 'paid' &&
+        item.payment_plan[0]?.sale_type !== 'resold',
+    );
+
+    const total_pending_payments_plan_price = _.sumBy(
+      filterpending_payments_plan,
+      'price',
+    );
+
+    const pending_payments =
+      _.toNumber(total_pending_payments_plan_price) -
+      _.toNumber(total_pending_payments_plan_detail);
+
     return {
       payments_received: payments_received ?? 0,
       pending_payments: pending_payments ?? 0,
@@ -224,6 +253,7 @@ export class FinanceService {
         reserved_unit: reserved,
       },
       sales: sales,
+      items: filterpending_payments_plan,
     };
   }
 }

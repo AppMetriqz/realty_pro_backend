@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UnitService } from './unit.service';
 import { UnitController } from './unit.controller';
 import { UnitModel } from './unit.model';
@@ -10,6 +10,7 @@ import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { PaymentModel } from '../payment/payment.model';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { NotificationModel } from '../notification/notification.model';
+import { SaleModule } from '../sale/sale.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { NotificationModel } from '../notification/notification.model';
       PaymentPlanDetailModel,
       NotificationModel,
     ]),
+    forwardRef(() => SaleModule),
   ],
   controllers: [UnitController],
   providers: [UnitService],

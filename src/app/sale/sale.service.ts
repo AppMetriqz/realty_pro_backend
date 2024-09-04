@@ -132,9 +132,11 @@ export class SaleService {
   async create({
     body,
     currentUser,
+    isCreateFromUnit,
   }: {
     body: CreateDto;
     currentUser: CurrentUserDto;
+    isCreateFromUnit?: boolean;
   }) {
     const unit = await this.unit.findByPk(body.unit_id);
 
@@ -144,7 +146,7 @@ export class SaleService {
       };
     }
 
-    if (unit.status !== 'available') {
+    if (unit.status !== 'available' && !isCreateFromUnit) {
       return {
         ...StatusCodes.BadRequest,
         message: 'Esta unidad no está disponible',

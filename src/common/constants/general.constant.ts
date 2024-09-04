@@ -38,6 +38,16 @@ export const MaritalStatuses = [
   'cohabitant',
 ];
 
+export enum MaritalStatusesEnumDto {
+  single = 'single',
+  married = 'married',
+  divorced = 'divorced',
+  widowed = 'widowed',
+  civil_union = 'civil_union',
+  separated = 'separated',
+  cohabitant = 'cohabitant',
+}
+
 export const NotificationType = ['sales'];
 
 export const StatusCodes = {

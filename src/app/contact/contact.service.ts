@@ -225,10 +225,11 @@ export class ContactService {
   }) {
     body.create_by = currentUser.user_id;
 
+    console.log('body', body);
+
     if (body.spouse_id > 0) {
       body.marital_status = 'married';
     }
-
     return await this.model.create(body);
   }
 
