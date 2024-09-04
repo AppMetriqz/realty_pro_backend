@@ -47,9 +47,9 @@ async function bootstrap() {
 
   console.log('Version', '1.0.1');
 
-  const appContext = await NestFactory.createApplicationContext(SeederModule);
-  const seederService = appContext.get(SeederService);
-  await seederService.seeder();
+  // const appContext = await NestFactory.createApplicationContext(SeederModule);
+  // const seederService = appContext.get(SeederService);
+  // await seederService.seeder();
 }
 
 bootstrap();
