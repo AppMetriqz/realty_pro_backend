@@ -178,12 +178,8 @@ export class SeederService {
     CASE WHEN ${payment_status_query} = 'paid' THEN 0 ELSE price - ${total_paid_amount_query} END AS stat_payment_pending
     FROM units where is_active = 1;
     `
-
-    // CASE WHEN ${payment_status_query}  = 'paid' THEN 0 ELSE price - ${total_paid_amount_query} END AS stat_payment_pending
-
-    // await this.sequelize.query(`DROP VIEW if exists ${View}`)
     await this.sequelize.query(query)
-    console.log('Vista creada exitosamente');
+    console.log('VIEW CREATED');
   }
 
 }
