@@ -10,6 +10,7 @@ import { NotificationModel } from '../notification/notification.model';
 import { SaleClientHistoryModel } from '../sale-client-history/sale-client-history.model';
 import { ContactModel } from '../contact/contact.model';
 import { PaymentModel } from '../payment/payment.model';
+import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PaymentModel } from '../payment/payment.model';
       NotificationModel,
       SaleClientHistoryModel,
       ContactModel,
+      UnitSalePlanDetailsView,
     ]),
   ],
   controllers: [PaymentPlanController],

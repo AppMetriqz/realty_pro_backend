@@ -286,6 +286,8 @@ export class FinanceService {
       {
         where: {
           project_id: projectIds,
+          unit_status: 'sold',
+          sale_is_active: true,
         },
       },
     );

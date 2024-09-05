@@ -29,6 +29,7 @@ import { ContactModel } from '../contact/contact.model';
 import { WhereOperators } from 'sequelize/types/model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
+import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 
 type Total = {
   qty: number;
@@ -51,6 +52,8 @@ export class PaymentPlanService {
     private readonly SaleClientHistory: typeof SaleClientHistoryModel,
     @InjectModel(ContactModel) private readonly Contact: typeof ContactModel,
     @InjectModel(PaymentModel) private readonly Payment: typeof PaymentModel,
+    @InjectModel(UnitSalePlanDetailsView)
+    private readonly UnitSalePlanDetails: typeof UnitSalePlanDetailsView,
     private sequelize: Sequelize,
   ) {}
 
@@ -107,6 +110,7 @@ export class PaymentPlanService {
     const result = await this.PaymentPlanDetail.findAndCountAll({
       limit,
       offset,
+      distinct: true,
       where: { ...where },
       attributes: {
         exclude: ['payment_plan_id', 'project_id'],
@@ -180,53 +184,27 @@ export class PaymentPlanService {
     const limit = _.toNumber(filters.pageSize);
     const sort_order = filters.sortOrder;
     const sort_by = filters.sortBy;
-    const dateFrom = filters.dateFrom;
-    const dateTo = filters.dateTo;
-
     let order = undefined;
     const projectIds = filters.projectIds;
 
     const today = DateTime.now().setZone('America/Santo_Domingo');
 
-    const where: {
-      is_active: boolean;
-      project_id: WhereOperators;
-      status: string;
-      created_at?: WhereOperators;
-    } = {
-      is_active: true,
-      status: 'paid',
-      project_id: {
-        [Op.in]: projectIds,
-      },
-    };
-
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];
-    }
-
-    if (_.size(dateFrom) > 0 && _.size(dateTo) > 0) {
-      where.created_at = { [Op.between]: [dateFrom, dateTo] };
     }
 
     const result = await this.model.findAndCountAll({
       limit,
       offset,
       order,
-      where: {
-        ...where,
-      },
-      attributes: [
-        ...Object.keys(this.model.getAttributes()),
-        [
-          Sequelize.literal(
-            '(SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id  = payment_plan.payment_plan_id)',
-          ),
-          'total_amount_paid',
-        ],
-      ],
       nest: true,
       raw: true,
+      distinct: true,
+      where: {
+        project_id: projectIds,
+        status: 'paid',
+        is_active: true,
+      },
       include: [
         {
           model: ProjectModel,
@@ -257,9 +235,14 @@ export class PaymentPlanService {
     });
 
     const rows = result.rows.map((result: PaymentPlanDto) => {
-      const paid_at = result.paid_at as string;
-      const targetDate = DateTime.fromFormat(paid_at, DateFormat);
-      const remaining_time = targetDate
+      const separation_date = result.separation_date as string;
+      const payment_plan_numbers = result.payment_plan_numbers;
+
+      const until_date = DateTime.fromFormat(separation_date, DateFormat).plus({
+        month: payment_plan_numbers,
+      });
+
+      const remaining_time = until_date
         .diff(today, ['days', 'hours'])
         .toObject();
 
@@ -267,20 +250,13 @@ export class PaymentPlanService {
       const client = _.get(sale, 'client', null);
 
       const total_amount = _.toNumber(result.total_amount);
-      const total_amount_paid = _.toNumber(result.total_amount_paid);
-      const separation_amount = _.toNumber(result.separation_amount);
-
-      // TODO:Cambiar a monto a financiar
-      const total_amount_financed =
-        total_amount - (total_amount_paid + separation_amount);
 
       return {
         ...result,
         remaining_time,
         sale: _.omit(sale, 'client'),
         client,
-        total_amount_paid: total_amount_financed,
-        total_amount_financed,
+        total_amount_paid: total_amount,
       };
     });
 
@@ -309,6 +285,7 @@ export class PaymentPlanService {
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
+        is_active: true,
         project_id: {
           [Op.in]: projectIds,
         },
@@ -331,6 +308,7 @@ export class PaymentPlanService {
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
+        is_active: true,
         project_id: {
           [Op.in]: projectIds,
         },
@@ -341,24 +319,18 @@ export class PaymentPlanService {
       },
     });
 
-    const promise3 = this.model.findAll({
-      attributes: ['payment_plan_id'],
+    const financing_payments = await this.UnitSalePlanDetails.findAll({
+      attributes: ['stat_payment_received'],
       where: {
-        status: 'paid',
-        project_id: {
-          [Op.in]: projectIds,
-        },
+        stage: 'payment_plan_completed',
+        project_id: projectIds,
       },
-      include: [
-        {
-          model: PaymentPlanDetailModel,
-          attributes: ['amount_paid'],
-        },
-      ],
     });
 
-    const [overdue_payments, pending_payments, financing_payments] =
-      await Promise.allSettled([promise1, promise2, promise3]);
+    const [overdue_payments, pending_payments] = await Promise.allSettled([
+      promise1,
+      promise2,
+    ]);
 
     const overdue_payments_value =
       overdue_payments.status === 'fulfilled'
@@ -368,19 +340,6 @@ export class PaymentPlanService {
       pending_payments.status === 'fulfilled'
         ? _.head(pending_payments.value)
         : null;
-
-    const financing_payments_value =
-      financing_payments.status === 'fulfilled'
-        ? financing_payments.value
-        : null;
-
-    const total = financing_payments_value.reduce((total, plan) => {
-      const sumaPlan = plan.payment_plan_details.reduce(
-        (suma, detalle) => suma + _.toNumber(detalle.amount_paid),
-        0,
-      );
-      return total + sumaPlan;
-    }, 0);
 
     const overdue_payments_total = overdue_payments_value as unknown as Total;
     const pending_payments_total = pending_payments_value as unknown as Total;
@@ -399,8 +358,8 @@ export class PaymentPlanService {
         qty: pending_payments_total.qty,
       },
       financing_payments: {
-        total,
-        qty: _.size(financing_payments_value),
+        total: _.sumBy(financing_payments, 'stat_payment_received'),
+        qty: _.size(financing_payments),
       },
     };
   }

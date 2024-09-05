@@ -153,7 +153,7 @@ export const onFullCancellation = async ({
 
     const values = {
       status: 'canceled',
-      is_active: payment_plan_is_active,
+      is_active: false,
       notes: notes,
       update_by: user_id,
     };

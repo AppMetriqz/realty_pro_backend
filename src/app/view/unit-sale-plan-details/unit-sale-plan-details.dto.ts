@@ -1,8 +1,9 @@
-
 export interface UnitSalePlanDetailsAttributes {
   project_id: number;
   unit_id: number;
   sale_id: number;
+  sale_is_active: boolean;
+  unit_status: string;
   payment_plan_id: number;
   stage: string;
   payment_status: string;

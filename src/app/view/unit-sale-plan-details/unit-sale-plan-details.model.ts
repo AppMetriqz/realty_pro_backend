@@ -16,8 +16,14 @@ export class UnitSalePlanDetailsView extends Model<UnitSalePlanDetailsAttributes
   @Column({ allowNull: true, type: DataType.BIGINT })
   sale_id: number;
 
+  @Column({ allowNull: true, type: DataType.BOOLEAN })
+  sale_is_active: boolean;
+
   @Column({ allowNull: true, type: DataType.BIGINT })
   payment_plan_id: number;
+
+  @Column({ allowNull: true, type: DataType.STRING(24) })
+  unit_status: string;
 
   @Column({ allowNull: true, type: DataType.STRING(24) })
   stage: string;

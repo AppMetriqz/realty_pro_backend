@@ -75,10 +75,11 @@ export class ContactService {
     }
 
     const paymentsPlan = await this.PaymentPlan.findAll({
-      // nest: true,
-      // raw: true,
       order: [['payment_plan_id', 'DESC']],
-      // where: { ...where },
+      where: {
+        status: { [Op.notIn]: ['canceled'] },
+        is_active: true,
+      },
       attributes: [
         ..._.keys(this.PaymentPlan.getAttributes()),
         [
@@ -140,13 +141,19 @@ export class ContactService {
             'status',
             'updated_at',
             'paid_at',
-            'payment_made_at'
+            'payment_made_at',
           ],
         },
         {
           model: PaymentModel,
           order: [['payment_id', 'ASC']],
-          attributes: ['payment_id', 'amount', 'payment_made_at', 'created_at', 'notes'],
+          attributes: [
+            'payment_id',
+            'amount',
+            'payment_made_at',
+            'created_at',
+            'notes',
+          ],
         },
       ],
     });
