@@ -15,6 +15,8 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { PaymentPlanDetailDto } from '../payment-plan-detail/payment-plan-detail.dto';
 import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
+import { PaymentModel } from '../payment/payment.model';
+import { PaymentDto } from '../payment/payment.dto';
 
 @Table({ tableName: 'payment_plans', modelName: 'payment_plan' })
 export class PaymentPlanModel extends Model<PaymentPlanDto> {
@@ -87,4 +89,9 @@ export class PaymentPlanModel extends Model<PaymentPlanDto> {
     onDelete: 'CASCADE',
   })
   payment_plan_details: PaymentPlanDetailDto[];
+
+  @HasMany(() => PaymentModel, {
+    onDelete: 'CASCADE',
+  })
+  payments: PaymentDto[];
 }

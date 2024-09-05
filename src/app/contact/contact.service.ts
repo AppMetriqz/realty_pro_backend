@@ -21,6 +21,7 @@ import { ProjectModel } from '../project/project.model';
 import { UnitModel } from '../unit/unit.model';
 import { Sequelize } from 'sequelize-typescript';
 import { WhereOperators } from 'sequelize/types/model';
+import { PaymentModel } from '../payment/payment.model';
 
 @Injectable()
 export class ContactService {
@@ -127,8 +128,9 @@ export class ContactService {
         },
         {
           model: PaymentPlanDetailModel,
-          order: [['payment_number', 'ASC']],
+          order: [['payment_plan_detail_id', 'ASC']],
           attributes: [
+            'payment_plan_detail_id',
             'payment_amount',
             'amount_paid',
             'total_amount_paid',
@@ -138,8 +140,13 @@ export class ContactService {
             'status',
             'updated_at',
             'paid_at',
-            'payment_made_at',
+            'payment_made_at'
           ],
+        },
+        {
+          model: PaymentModel,
+          order: [['payment_id', 'ASC']],
+          attributes: ['payment_id', 'amount', 'payment_made_at', 'created_at', 'notes'],
         },
       ],
     });

@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PaymentModel } from './payment.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateDto, DeleteDto, FindAllDto, UpdateDto } from './payment.dto';
+import { CreateDto, FindAllDto } from './payment.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { StatusCodes } from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
-import { ModelProperties, getPaidAmountByPlanNumber } from './payment.core';
+import { getPaidAmountByPlanNumber } from './payment.core';
 import { Sequelize } from 'sequelize-typescript';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { SaleModel } from '../sale/sale.model';
 import { LoggerModel } from '../logger/logger.model';
-import { DateTime } from 'luxon';
 
 @Injectable()
 export class PaymentService {
@@ -52,18 +51,6 @@ export class PaymentService {
       order,
       where: { ...where },
     });
-  }
-
-  async findOne({ id }: { id: number }) {
-    const model = await this.model.findByPk(id, { ...ModelProperties });
-    if (!model) {
-      return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
-      };
-    }
-    return model;
   }
 
   async create({
@@ -143,6 +130,7 @@ export class PaymentService {
         amount: amount_paid,
         create_by: currentUser.user_id,
         payment_made_at: payment_made_at,
+        notes: body.notes,
       };
 
       const payment = await this.model.create(values, { transaction });
@@ -234,56 +222,5 @@ export class PaymentService {
 
       return payment;
     });
-  }
-
-  async update({
-    id,
-    body,
-    currentUser,
-  }: {
-    id: number;
-    body: UpdateDto;
-    currentUser: CurrentUserDto;
-  }) {
-    const model = await this.model.findByPk(id);
-    if (!model) {
-      return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
-      };
-    }
-
-    const values = {
-      ...body,
-      update_by: currentUser.user_id,
-    };
-
-    return model.update(values);
-  }
-
-  async remove({
-    id,
-    body,
-    currentUser,
-  }: {
-    id: number;
-    body: DeleteDto;
-    currentUser: CurrentUserDto;
-  }) {
-    const model = await this.model.findByPk(id);
-    if (!model) {
-      return {
-        statusCode: StatusCodes.NotFound.statusCode,
-        error: StatusCodes.NotFound.error,
-        message: StatusCodes.NotFound.message,
-      };
-    }
-    await model.update({
-      is_active: false,
-      notes: body.notes,
-      update_by: currentUser.user_id,
-    });
-    return { message: 'deleted' };
   }
 }
