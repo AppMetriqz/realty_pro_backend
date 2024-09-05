@@ -78,7 +78,7 @@ export class UnitModel extends Model<UnitDto> {
   @Column({ type: DataType.DECIMAL(10, 2), defaultValue: null })
   price_per_meter: number;
 
-  @Column({ type: DataType.DOUBLE(10, 2), allowNull: false })
+  @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   price: number;
 
   @Column({ type: DataType.STRING, defaultValue: null })

@@ -45,7 +45,7 @@ export class PaymentModel extends Model<PaymentDto> {
   @BelongsTo(() => SaleModel, 'sale_id')
   sale: SaleModel;
 
-  @Column({ type: DataType.DOUBLE(10, 2), allowNull: false })
+  @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   amount: number;
 
   @Column({ type: DataType.DATEONLY, defaultValue: null })

@@ -50,7 +50,7 @@ export class SaleModel extends Model<SaleDto> {
   @BelongsTo(() => ContactModel, 'seller_id')
   seller: ContactModel;
 
-  @Column({ type: DataType.DOUBLE(10, 2), allowNull: false })
+  @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   price: number;
 
   @Column({ type: DataType.FLOAT(2), allowNull: false })

@@ -54,13 +54,13 @@ export class PaymentPlanDetailModel extends Model<PaymentPlanDetailDto> {
   })
   sale_type: string;
 
-  @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
+  @Column({ type: DataType.DECIMAL(20, 2), allowNull: false })
   payment_amount: number;
 
-  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  @Column({ type: DataType.DECIMAL(20, 2), defaultValue: 0 })
   amount_paid: number;
 
-  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  @Column({ type: DataType.DECIMAL(20, 2), defaultValue: 0 })
   total_amount_paid: number;
 
   @Column({ type: DataType.INTEGER, allowNull: false })

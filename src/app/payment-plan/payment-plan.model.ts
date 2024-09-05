@@ -49,10 +49,10 @@ export class PaymentPlanModel extends Model<PaymentPlanDto> {
   })
   sale_type: string;
 
-  @Column({ type: DataType.DOUBLE(10, 2), allowNull: false })
+  @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   total_amount: number;
 
-  @Column({ type: DataType.DOUBLE(10, 2), allowNull: false })
+  @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   separation_amount: number;
 
   @Column({ type: DataType.DATEONLY, allowNull: false })
