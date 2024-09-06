@@ -53,6 +53,9 @@ export class UnitSalePlanDetailsView extends Model<UnitSalePlanDetailsAttributes
   total_additional_amount: number;
 
   @Column({ type: DataType.DECIMAL(33, 2) })
+  stat_payment_financing: number;
+
+  @Column({ type: DataType.DECIMAL(33, 2) })
   stat_payment_received: number;
 
   @Column({ type: DataType.DECIMAL(33, 2) })

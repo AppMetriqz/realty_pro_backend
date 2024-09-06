@@ -205,6 +205,15 @@ export class PaymentPlanService {
         status: 'paid',
         is_active: true,
       },
+      attributes: [
+        ...Object.keys(this.model.getAttributes()),
+        [
+          Sequelize.literal(
+            '(SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id  = payment_plan.payment_plan_id)',
+          ),
+          'total_amount_paid',
+        ],
+      ],
       include: [
         {
           model: ProjectModel,
@@ -230,6 +239,13 @@ export class PaymentPlanService {
               order,
             },
           ],
+          where: {
+            stage: [
+              'separation',
+              'payment_plan_in_progress',
+              'payment_plan_completed',
+            ],
+          },
         },
       ],
     });
@@ -251,12 +267,18 @@ export class PaymentPlanService {
 
       const total_amount = _.toNumber(result.total_amount);
 
+      const total_amount_paid = _.toNumber(result.total_amount_paid);
+      const separation_amount = _.toNumber(result.separation_amount);
+
+      const total_amount_financed =
+        total_amount - (total_amount_paid + separation_amount);
+
       return {
         ...result,
         remaining_time,
         sale: _.omit(sale, 'client'),
         client,
-        total_amount_paid: total_amount,
+        total_amount_paid: total_amount_financed,
       };
     });
 
@@ -320,7 +342,7 @@ export class PaymentPlanService {
     });
 
     const financing_payments = await this.UnitSalePlanDetails.findAll({
-      attributes: ['stat_payment_received'],
+      attributes: ['stat_payment_financing'],
       where: {
         stage: 'payment_plan_completed',
         project_id: projectIds,
@@ -358,7 +380,7 @@ export class PaymentPlanService {
         qty: pending_payments_total.qty,
       },
       financing_payments: {
-        total: _.sumBy(financing_payments, 'stat_payment_received'),
+        total: _.sumBy(financing_payments, 'stat_payment_financing'),
         qty: _.size(financing_payments),
       },
     };

@@ -14,6 +14,7 @@ export interface UnitSalePlanDetailsAttributes {
   total_due_amount: number;
   total_pending_amount: number;
   total_additional_amount: number;
+  stat_payment_financing: number;
   stat_payment_received: number;
   stat_payment_pending: number;
 }
