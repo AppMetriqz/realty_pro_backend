@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
+import { Transform } from 'class-transformer';
 
 export class UserDto {
   user_id?: number;
@@ -83,6 +84,9 @@ export class FindAllDto {
   @ValidateIf((o) => _.isString(o.dateFrom) && o.dateFrom !== '')
   @IsNotEmpty()
   dateTo: string;
+
+  @Transform(({ value }) => value ?? '')
+  searchText: string;
 }
 
 export class FindAllAutocompleteDto {

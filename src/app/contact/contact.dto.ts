@@ -156,10 +156,8 @@ export class FindAllDto {
   @IsArray()
   type: string[];
 
-  // @ValidateIf((o) => _.isString(o.type) && o.type !== '')
-  // @IsEnum(ContactType)
-  // @IsNotEmpty()
-  // type: keyof typeof ContactTypeEnumDto;
+  @Transform(({ value }) => value ?? '')
+  searchText: string;
 }
 
 export class FindAllPaymentPlansDto {

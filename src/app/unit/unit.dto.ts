@@ -169,6 +169,9 @@ export class FindAllDto {
   @ValidateIf((o) => _.isString(o.projectId) && o.projectId !== '')
   @Transform((value) => _.toNumber(value.value))
   projectId: number;
+
+  @Transform(({ value }) => value ?? '')
+  searchText: string;
 }
 
 export class FindAllAutocompleteDto {

@@ -56,8 +56,8 @@ export class UnitService {
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
     const projectId = filters.projectId;
-
     const status = filters.status;
+    const searchText = filters.searchText ?? '';
 
     let order = undefined;
     const where: {
@@ -100,7 +100,13 @@ export class UnitService {
           },
         },
       ],
-      where: { ...where },
+      where: {
+        ...where,
+        [Op.or]: [
+          { name: { [Op.like]: `%${searchText}%` } },
+          { description: { [Op.like]: `%${searchText}%` } },
+        ],
+      },
     });
   }
 

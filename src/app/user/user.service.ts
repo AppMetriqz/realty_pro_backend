@@ -29,6 +29,7 @@ export class UserService {
     const sort_by = filters.sortBy;
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
+    const searchText = filters.searchText ?? '';
 
     let order = undefined;
     const where: { created_at?: any } = {};
@@ -46,7 +47,16 @@ export class UserService {
       limit,
       offset,
       order,
-      where: { ...where },
+      where: {
+        ...where,
+        [Op.or]: [
+          { first_name: { [Op.like]: `%${searchText}%` } },
+          { last_name: { [Op.like]: `%${searchText}%` } },
+          { phone_number: { [Op.like]: `%${searchText}%` } },
+          { national_id: { [Op.like]: `%${searchText}%` } },
+          { email: { [Op.like]: `%${searchText}%` } },
+        ],
+      },
     });
   }
 

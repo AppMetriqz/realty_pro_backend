@@ -39,6 +39,7 @@ export class ContactService {
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
     const type = filters.type;
+    const searchText = filters.searchText ?? '';
 
     let order = undefined;
     const where: { created_at?: any; type?: string[] } = {};
@@ -59,7 +60,17 @@ export class ContactService {
       limit,
       offset,
       order,
-      where: { ...where },
+      where: {
+        ...where,
+        [Op.or]: [
+          { first_name: { [Op.like]: `%${searchText}%` } },
+          { last_name: { [Op.like]: `%${searchText}%` } },
+          { phone_number_1: { [Op.like]: `%${searchText}%` } },
+          { phone_number_2: { [Op.like]: `%${searchText}%` } },
+          { national_id: { [Op.like]: `%${searchText}%` } },
+          { email: { [Op.like]: `%${searchText}%` } },
+        ],
+      },
     });
   }
 

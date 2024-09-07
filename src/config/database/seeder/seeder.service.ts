@@ -172,6 +172,7 @@ export class SeederService {
     (SELECT is_active from sales WHERE sales.unit_id = units.unit_id and is_active = 1) as sale_is_active,
     ${payment_plan_id} as payment_plan_id,
     status as unit_status, 
+    name as unit_name, 
     ${stage} as stage, 
     ${payment_status} as payment_status,
     price as amount,
@@ -182,7 +183,7 @@ export class SeederService {
     COALESCE((SELECT GREATEST((SUM(payment_amount) - SUM(amount_paid)),0) as total FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_pending_amount,
     ${total_additional_amount} as total_additional_amount,
     CASE WHEN ${stage} = 'payment_plan_completed' THEN price - ${total_paid_amount_separation} ELSE 0 END AS stat_payment_financing,
-    CASE WHEN ${payment_status} = 'paid' THEN price + ${total_additional_amount} ELSE ${total_paid_amount_separation} END AS stat_payment_received,
+    CASE WHEN ${stage} = 'financed' THEN price + ${total_additional_amount} ELSE ${total_paid_amount_separation} END AS stat_payment_received,
     CASE WHEN ${payment_status} = 'paid' THEN 0 ELSE price - ${total_paid_amount_separation} END AS stat_payment_pending
     FROM units where is_active = 1;
     `;
