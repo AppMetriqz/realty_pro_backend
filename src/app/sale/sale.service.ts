@@ -55,6 +55,7 @@ export class SaleService {
     const projectId = filters.projectId;
 
     const stage = filters.stage;
+    const searchText = filters.searchText ?? '';
 
     let order = undefined;
     const where: {
@@ -81,11 +82,52 @@ export class SaleService {
     }
 
     return await this.model.findAndCountAll({
-      ...ModelProperties,
       limit,
       offset,
       order,
       where: { ...where },
+      include: [
+        {
+          model: ProjectModel,
+          attributes: ['project_id', 'name'],
+        },
+        {
+          model: UnitModel,
+          attributes: ['unit_id', 'name'],
+          where: {
+            [Op.or]: [
+              { name: { [Op.like]: `%${searchText}%` } },
+              { description: { [Op.like]: `%${searchText}%` } },
+            ],
+          },
+        },
+        {
+          model: ContactModel,
+          as: 'client',
+          attributes: [
+            'contact_id',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number_1',
+            'phone_number_1',
+            'national_id',
+          ],
+        },
+        {
+          model: ContactModel,
+          as: 'seller',
+          attributes: [
+            'contact_id',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number_1',
+            'phone_number_1',
+            'national_id',
+          ],
+        },
+      ],
     });
   }
 
