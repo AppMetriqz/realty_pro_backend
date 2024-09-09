@@ -41,6 +41,7 @@ export class SeederService {
       this.createViewPaymentPendingPlan(),
     ]);
     await this.createUsers();
+
     console.log('seeder Ready');
   }
 

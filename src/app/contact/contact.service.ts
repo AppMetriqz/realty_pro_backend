@@ -11,7 +11,10 @@ import {
 } from './contact.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
-import { StatusCodes } from '../../common/constants';
+import {
+  onRemoveCircularReferences,
+  StatusCodes,
+} from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
 import { ModelProperties } from './contact.core';
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
@@ -169,22 +172,7 @@ export class ContactService {
       ],
     });
 
-    function removeCircularReferences(obj: any) {
-      const seen = new WeakSet();
-      return JSON.parse(
-        JSON.stringify(obj, (key, value) => {
-          if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-              return;
-            }
-            seen.add(value);
-          }
-          return value;
-        }),
-      );
-    }
-
-    const sanitizedPaymentsPlan = removeCircularReferences(paymentsPlan);
+    const sanitizedPaymentsPlan = onRemoveCircularReferences(paymentsPlan);
 
     return sanitizedPaymentsPlan.map(
       (item: PaymentPlanModel & { total_amount_paid: number }) => {

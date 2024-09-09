@@ -11,11 +11,10 @@ import {
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { StatusCodes } from '../../common/constants';
+import { getImageBase64, onRemoveCircularReferences, StatusCodes } from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
 import { ProjectPropertyFeaturesDto } from '../project-property-features/project-property-features.dto';
 import { ProjectPropertyFeaturesModel } from '../project-property-features/project-property-features.model';
-import * as fs from 'fs-extra';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { UnitModel } from '../unit/unit.model';
 import { PropertyFeaturesModel } from '../property-features/property-features.model';
@@ -25,6 +24,7 @@ import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { NotificationModel } from '../notification/notification.model';
 import { PaymentModel } from '../payment/payment.model';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class ProjectService {
@@ -63,7 +63,7 @@ export class ProjectService {
       where.created_at = { [Op.between]: [dateFrom, dateTo] };
     }
 
-    return await this.model.findAndCountAll({
+    const result = await this.model.findAndCountAll({
       limit,
       offset,
       order,
@@ -85,6 +85,18 @@ export class ProjectService {
         ],
       ],
     });
+
+    const rows = onRemoveCircularReferences(result.rows);
+
+    return {
+      count: result.count,
+      rows: _.map(rows, (items) => {
+        return {
+          ...items,
+          cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
+        };
+      }),
+    };
   }
 
   async summary({ id }: { id: number }) {
@@ -202,7 +214,7 @@ export class ProjectService {
       unit_meters_to: unit_meters_to_value,
       currency_type: project.currency_type,
       country_code: project.country_code,
-      cover_path: project.cover_path,
+      cover: project.cover,
       property_features: property_features,
       type: project.type,
     };
@@ -386,7 +398,9 @@ export class ProjectService {
       where.currency_type = currencyType;
     }
 
-    return await this.model.findAll({
+    const result = await this.model.findAll({
+      raw: true,
+      nest: true,
       limit: limit ?? 10,
       order: [['name', 'ASC']],
       where: {
@@ -408,6 +422,13 @@ export class ProjectService {
           'unit_to_price',
         ],
       ],
+    });
+
+    return _.map(result, (items) => {
+      return {
+        ...items,
+        cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
+      };
     });
   }
 
@@ -447,6 +468,7 @@ export class ProjectService {
       ..._.omit(data, ['project_property_feature']),
       property_features,
       property_feature_ids,
+      cover: getImageBase64(data.cover as Buffer, data.cover_mimetype),
     };
   }
 
@@ -463,9 +485,11 @@ export class ProjectService {
 
     return await this.sequelize.transaction(async (transaction) => {
       if (!_.isEmpty(file)) {
-        body.cover_name = file.filename;
-        body.cover_path = file.path;
-        body.cover_size = file.size;
+        body.cover = await sharp(file.buffer)
+          .resize(800)
+          .webp({ effort: 3 })
+          .toBuffer();
+        body.cover_mimetype = file.mimetype;
       }
       const model = await this.model.create(body, { transaction });
 
@@ -507,6 +531,8 @@ export class ProjectService {
       };
     }
 
+    console.log('file', file);
+
     const project_id = id;
     const property_feature_ids = body.property_feature_ids;
 
@@ -514,12 +540,11 @@ export class ProjectService {
       body.update_by = currentUser.user_id;
 
       if (file) {
-        if (model.cover_path) {
-          await fs.remove(model.cover_path);
-        }
-        body.cover_name = file.filename;
-        body.cover_path = file.path;
-        body.cover_size = file.size;
+        body.cover = await sharp(file.buffer)
+          .resize(800)
+          .webp({ effort: 3 })
+          .toBuffer();
+        body.cover_mimetype = file.mimetype;
       }
 
       const modelUpdated = await model.update(body, {

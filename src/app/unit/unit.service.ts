@@ -13,7 +13,11 @@ import {
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { StatusCodes } from '../../common/constants';
+import {
+  getImageBase64,
+  onRemoveCircularReferences,
+  StatusCodes,
+} from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
 import * as fs from 'fs-extra';
 import { UnitPropertyFeaturesModel } from '../unit-property-features/unit-property-features.model';
@@ -29,6 +33,7 @@ import { ModelProperties } from './unit.core';
 import { ContactModel } from '../contact/contact.model';
 import { createNotifications } from '../sale/sale.core';
 import { SaleClientHistoryModel } from '../sale-client-history/sale-client-history.model';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class UnitService {
@@ -88,7 +93,7 @@ export class UnitService {
       where.created_at = { [Op.between]: [dateFrom, dateTo] };
     }
 
-    return await this.model.findAndCountAll({
+    const result = await this.model.findAndCountAll({
       limit,
       offset,
       order,
@@ -111,11 +116,23 @@ export class UnitService {
         ],
       },
     });
+
+    const rows = onRemoveCircularReferences(result.rows);
+
+    return {
+      count: result.count,
+      rows: _.map(rows, (items) => {
+        return {
+          ...items,
+          cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
+        };
+      }),
+    };
   }
 
   async findAllAutocomplete(filters: FindAllAutocompleteDto) {
     const description = filters.description;
-    return await this.model.findAll({
+    const result =  await this.model.findAll({
       limit: 10,
       order: [['name', 'ASC']],
       where: {
@@ -124,6 +141,13 @@ export class UnitService {
           { description: { [Op.like]: `%${description}%` } },
         ],
       },
+    });
+
+    return _.map(result, (items) => {
+      return {
+        ...items,
+        cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
+      };
     });
   }
 
@@ -156,6 +180,7 @@ export class UnitService {
       client: client ?? null,
       property_feature_ids,
       property_features,
+      cover: getImageBase64(data.cover as Buffer, data.cover_mimetype),
     };
   }
 
@@ -172,9 +197,11 @@ export class UnitService {
 
     return this.sequelize.transaction(async (transaction) => {
       if (file) {
-        body.cover_name = file.filename;
-        body.cover_path = file.path;
-        body.cover_size = file.size;
+        body.cover = await sharp(file.buffer)
+          .resize(800)
+          .webp({ effort: 3 })
+          .toBuffer();
+        body.cover_mimetype = file.mimetype;
       }
       const model = await this.model.create(body, { transaction });
 
@@ -272,12 +299,11 @@ export class UnitService {
       body.update_by = currentUser.user_id;
 
       if (file) {
-        if (model.cover_path) {
-          await fs.remove(model.cover_path);
-        }
-        body.cover_name = file.filename;
-        body.cover_path = file.path;
-        body.cover_size = file.size;
+        body.cover = await sharp(file.buffer)
+          .resize(800)
+          .webp({ effort: 3 })
+          .toBuffer();
+        body.cover_mimetype = file.mimetype;
       }
 
       const modelUpdated = await model.update(body, {

@@ -29,9 +29,8 @@ export class UnitDto {
   bathrooms: number;
   price_per_meter: number;
   price: number;
-  cover_name: string;
-  cover_path: string;
-  cover_size: number;
+  cover: Buffer |string;
+  cover_mimetype: string;
   status: string;
   is_active: boolean;
   create_by?: number;
@@ -55,9 +54,8 @@ export class CreateDto {
   bathrooms: number;
   price: number;
   price_per_meter: number;
-  cover_name: string;
-  cover_path: string;
-  cover_size: number;
+  cover: Buffer;
+  cover_mimetype: string;
   status: string;
 
   @Transform((value) =>
@@ -87,9 +85,8 @@ export class UpdateDto {
   bathrooms: number;
   price: number;
   price_per_meter: number;
-  cover_name: string;
-  cover_path: string;
-  cover_size: number;
+  cover: Buffer;
+  cover_mimetype: string;
   status: string;
 
   @Transform((value) =>

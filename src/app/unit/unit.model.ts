@@ -81,14 +81,11 @@ export class UnitModel extends Model<UnitDto> {
   @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   price: number;
 
-  @Column({ type: DataType.STRING, defaultValue: null })
-  cover_name: string;
+  @Column({ type: DataType.BLOB, defaultValue: null })
+  cover: Buffer;
 
   @Column({ type: DataType.STRING, defaultValue: null })
-  cover_path: string;
-
-  @Column({ type: DataType.INTEGER, defaultValue: null })
-  cover_size: number;
+  cover_mimetype: string;
 
   @Column({ type: DataType.STRING, defaultValue: null })
   notes: string;
