@@ -27,7 +27,8 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { NotificationModel } from '../notification/notification.model';
 import { ModelProperties } from './unit.core';
 import { ContactModel } from '../contact/contact.model';
-import { SaleService } from '../sale/sale.service';
+import { createNotifications } from '../sale/sale.core';
+import { SaleClientHistoryModel } from '../sale-client-history/sale-client-history.model';
 
 @Injectable()
 export class UnitService {
@@ -44,8 +45,10 @@ export class UnitService {
     private readonly PaymentPlanDetail: typeof PaymentPlanDetailModel,
     @InjectModel(NotificationModel)
     private readonly Notification: typeof NotificationModel,
+    @InjectModel(SaleClientHistoryModel)
+    private readonly SaleClientHistory: typeof SaleClientHistoryModel,
+    @InjectModel(ContactModel) private readonly Contact: typeof ContactModel,
     private sequelize: Sequelize,
-    private saleService: SaleService,
   ) {}
 
   async findAll(filters: FindAllDto) {
@@ -167,7 +170,7 @@ export class UnitService {
   }) {
     body.create_by = currentUser.user_id;
 
-    const unit = await this.sequelize.transaction(async (transaction) => {
+    return this.sequelize.transaction(async (transaction) => {
       if (file) {
         body.cover_name = file.filename;
         body.cover_path = file.path;
@@ -193,24 +196,47 @@ export class UnitService {
           ignoreDuplicates: true,
         });
       }
-      return model;
-    });
 
-    if (body.status === 'sold') {
-      const sale = await this.saleService.create({
-        isCreateFromUnit: true,
-        currentUser,
-        body: {
+      if (body.status === 'sold') {
+        const values = {
           project_id: body.project_id,
-          unit_id: unit.unit_id,
+          unit_id: unit_id,
           client_id: 1,
           seller_id: 2,
           commission: 0,
-        },
-      });
-      return { ...unit, sale };
-    }
-    return unit;
+          price: model.price,
+          stage: 'separation',
+          create_by: currentUser.user_id,
+        };
+
+        const sale = await this.Sale.create(values, { transaction });
+        const seller_id = values?.seller_id;
+
+        await createNotifications({
+          seller_id: seller_id,
+          commission: values.commission,
+          create_by: currentUser.user_id,
+          sale_id: sale.sale_id,
+          transaction,
+          Notification: this.Notification,
+          Contact: this.Contact,
+        });
+
+        await this.SaleClientHistory.create(
+          {
+            sale_id: sale.sale_id,
+            client_id: values.client_id,
+            sale_type: 'sale',
+            total_amount: sale.price,
+          },
+          { transaction },
+        );
+
+        return { ...sale.get({ plain: true }), sale };
+      }
+
+      return model;
+    });
   }
 
   async update({

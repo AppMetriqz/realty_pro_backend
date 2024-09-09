@@ -40,8 +40,7 @@ export class SaleService {
     private readonly PaymentPlan: typeof PaymentPlanModel,
     @InjectModel(PaymentPlanDetailModel)
     private readonly PaymentPlanDetail: typeof PaymentPlanDetailModel,
-    @InjectModel(SaleClientHistoryModel)
-    private readonly SaleClientHistory: typeof SaleClientHistoryModel,
+    @InjectModel(SaleClientHistoryModel) private readonly SaleClientHistory: typeof SaleClientHistoryModel,
     private sequelize: Sequelize,
   ) {}
 

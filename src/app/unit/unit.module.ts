@@ -10,7 +10,8 @@ import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { PaymentModel } from '../payment/payment.model';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { NotificationModel } from '../notification/notification.model';
-import { SaleModule } from '../sale/sale.module';
+import { SaleClientHistoryModel } from '../sale-client-history/sale-client-history.model';
+import { ContactModel } from '../contact/contact.model';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { SaleModule } from '../sale/sale.module';
       PaymentModel,
       PaymentPlanDetailModel,
       NotificationModel,
+      SaleClientHistoryModel,
+      ContactModel,
     ]),
-    forwardRef(() => SaleModule),
   ],
   controllers: [UnitController],
   providers: [UnitService],
