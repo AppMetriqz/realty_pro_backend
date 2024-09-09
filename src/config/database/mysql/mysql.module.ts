@@ -20,7 +20,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
         ssl: true,
         sync: {
           // force: true, //TODO Remover en pro
-          alter: process.env.NODE_ENV !== 'production', //TODO Remover en pro
+          alter: false, //TODO Remover en pro
         },
         define: {
           createdAt: 'created_at',
