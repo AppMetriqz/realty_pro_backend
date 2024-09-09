@@ -38,6 +38,7 @@ export class SeederService {
       this.createContacts(),
       this.createPropertyFeatures(),
       this.createViewUnitSalePlan(),
+      this.createViewPaymentPendingPlan(),
     ]);
     await this.createUsers();
     console.log('seeder Ready');
@@ -188,6 +189,22 @@ export class SeederService {
     FROM units where is_active = 1;
     `;
     await this.sequelize.query(query);
-    console.log('VIEW CREATED');
+    console.log('Unit_Sale_Plan_Details CREATED');
+  }
+
+  async createViewPaymentPendingPlan() {
+    const View = 'Current_Payment_Pending';
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+        SELECT ppd.*
+      FROM payment_plan_details ppd
+      INNER JOIN (
+          SELECT payment_plan_id, MIN(payment_date) as oldest_payment_date
+          FROM payment_plan_details
+          WHERE status = 'pending'
+          GROUP BY payment_plan_id
+      ) as oldest ON ppd.payment_plan_id = oldest.payment_plan_id 
+      AND ppd.payment_date = oldest.oldest_payment_date`;
+    await this.sequelize.query(query);
+    console.log('Current_Payment_Pending CREATED');
   }
 }

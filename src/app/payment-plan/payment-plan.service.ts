@@ -30,6 +30,7 @@ import { WhereOperators } from 'sequelize/types/model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
+import { CurrentPaymentPendingView } from '../view/current-payment-pending/current-payment-pending.model';
 
 type Total = {
   qty: number;
@@ -44,6 +45,8 @@ export class PaymentPlanService {
     private readonly model: typeof PaymentPlanModel,
     @InjectModel(PaymentPlanDetailModel)
     private readonly PaymentPlanDetail: typeof PaymentPlanDetailModel,
+    @InjectModel(CurrentPaymentPendingView)
+    private readonly CurrentPaymentPending: typeof CurrentPaymentPendingView,
     @InjectModel(ProjectModel) private readonly Project: typeof ProjectModel,
     @InjectModel(SaleModel) private readonly Sale: typeof SaleModel,
     @InjectModel(NotificationModel)
@@ -107,7 +110,13 @@ export class PaymentPlanService {
         break;
     }
 
-    const result = await this.PaymentPlanDetail.findAndCountAll({
+    // let result = []
+
+    const result = await (
+      planFilterStats === 'overdue_payment'
+        ? this.CurrentPaymentPending
+        : this.PaymentPlanDetail
+    ).findAndCountAll({
       limit,
       offset,
       distinct: true,

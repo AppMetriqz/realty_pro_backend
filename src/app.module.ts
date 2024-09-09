@@ -19,7 +19,8 @@ import {
   FinanceModule,
   DesktopModule,
   LoggerModule,
-  UnitSalePlanDetailsModule
+  UnitSalePlanDetailsModule,
+  CurrentPaymentPendingModule,
 } from './app';
 import { ConfigurationModule, FileModule, MysqlModule } from './config';
 
@@ -47,7 +48,8 @@ import { ConfigurationModule, FileModule, MysqlModule } from './config';
     FinanceModule,
     DesktopModule,
     LoggerModule,
-    UnitSalePlanDetailsModule
+    UnitSalePlanDetailsModule,
+    CurrentPaymentPendingModule,
   ],
 })
 export class AppModule {}
