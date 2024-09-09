@@ -185,10 +185,9 @@ export class SeederService {
     COALESCE((SELECT GREATEST((SUM(payment_amount) - SUM(amount_paid)),0) as total FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_pending_amount,
     ${total_additional_amount} as total_additional_amount,
     CASE WHEN ${stage} = 'payment_plan_completed' THEN price - ${total_paid_amount_separation} ELSE 0 END AS stat_payment_financing,
-    CASE WHEN ${stage} = 'financed' THEN price + ${total_additional_amount} ELSE ${total_paid_amount_separation} END AS stat_payment_received,
-    CASE WHEN ${payment_status} = 'paid' THEN 0 ELSE price - ${total_paid_amount_separation} END AS stat_payment_pending
-    FROM units where is_active = 1;
-    `;
+    CASE WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation} ELSE ${total_paid_amount_separation} END AS stat_payment_received,
+    CASE WHEN ${stage} = 'financed' THEN 0 ELSE price - ${total_paid_amount_separation} END AS stat_payment_pending
+    FROM units where is_active = 1;`;
     await this.sequelize.query(query);
     console.log('Unit_Sale_Plan_Details CREATED');
   }

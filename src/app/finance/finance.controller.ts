@@ -13,9 +13,4 @@ export class FinanceController {
     return this.service.findAll(filters);
   }
 
-  @Get('old')
-  @UseFilters(new HttpExceptionFilter())
-  findAllOld(@Query() filters: FindAllDto) {
-    return this.service.findAllOld(filters);
-  }
 }
