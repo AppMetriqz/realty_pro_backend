@@ -15,6 +15,15 @@ import { UnitModel } from '../../../app/unit/unit.model';
 import { ProjectModel } from '../../../app/project/project.model';
 import { CreateDto } from '../../../app/contact/contact.dto';
 import { Sequelize } from 'sequelize-typescript';
+import { LoggerModel } from '../../../app/logger/logger.model';
+import { SaleModel } from '../../../app/sale/sale.model';
+import { PaymentModel } from '../../../app/payment/payment.model';
+import { PaymentPlanModel } from '../../../app/payment-plan/payment-plan.model';
+import { PaymentPlanDetailModel } from '../../../app/payment-plan-detail/payment-plan-detail.model';
+import { ProjectPropertyFeaturesModel } from '../../../app/project-property-features/project-property-features.model';
+import { UnitPropertyFeaturesModel } from '../../../app/unit-property-features/unit-property-features.model';
+import { NotificationModel } from '../../../app/notification/notification.model';
+import { SaleClientHistoryModel } from '../../../app/sale-client-history/sale-client-history.model';
 
 @Injectable()
 export class SeederService {
@@ -32,6 +41,8 @@ export class SeederService {
   ) {}
 
   async seeder() {
+    await this.syncModels();
+
     await Promise.race([
       this.createRoles(),
       this.createStatuses(),
@@ -151,6 +162,25 @@ export class SeederService {
       ignoreDuplicates: true,
       updateOnDuplicate: ['user_id'],
     });
+  }
+
+  async syncModels() {
+    await PropertyFeaturesModel.sync();
+    await StatusModel.sync();
+    await ProjectModel.sync();
+    await UnitModel.sync();
+    await ContactModel.sync();
+    await RoleModel.sync();
+    await UserModel.sync();
+    await SaleModel.sync();
+    await PaymentPlanModel.sync();
+    await PaymentPlanDetailModel.sync();
+    await PaymentModel.sync();
+    await ProjectPropertyFeaturesModel.sync();
+    await UnitPropertyFeaturesModel.sync();
+    await NotificationModel.sync();
+    await LoggerModel.sync();
+    await SaleClientHistoryModel.sync();
   }
 
   async createViewUnitSalePlan() {

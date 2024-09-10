@@ -5,10 +5,10 @@ import {
   PrimaryKey,
   AutoIncrement,
   DataType,
-} from "sequelize-typescript";
-import { StatusDto } from "./status.dto";
+} from 'sequelize-typescript';
+import { StatusDto } from './status.dto';
 
-@Table({ tableName: "statuses" })
+@Table({ tableName: 'statuses' })
 export class StatusModel extends Model<StatusDto> {
   @PrimaryKey
   @AutoIncrement

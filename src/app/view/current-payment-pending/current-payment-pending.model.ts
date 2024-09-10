@@ -4,7 +4,8 @@ import {
   Column,
   DataType,
   ForeignKey,
-  BelongsTo, PrimaryKey, AutoIncrement,
+  BelongsTo,
+  PrimaryKey,
 } from 'sequelize-typescript';
 import { CurrentPaymentPendingViewDto } from './current-payment-pending.dto';
 import { ProjectModel } from '../../project/project.model';
@@ -16,10 +17,10 @@ import { PaymentPlanModel } from '../../payment-plan/payment-plan.model';
   tableName: 'Current_Payment_Pending',
   timestamps: false,
   comment: 'VIEW',
+  freezeTableName: true,
 })
 export class CurrentPaymentPendingView extends Model<CurrentPaymentPendingViewDto> {
   @PrimaryKey
-  @AutoIncrement
   @Column({ type: DataType.INTEGER })
   payment_plan_detail_id: number;
 
@@ -92,3 +93,4 @@ export class CurrentPaymentPendingView extends Model<CurrentPaymentPendingViewDt
   @Column({ type: DataType.INTEGER, defaultValue: null })
   update_by: number;
 }
+

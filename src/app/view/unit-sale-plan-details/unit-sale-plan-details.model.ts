@@ -5,6 +5,7 @@ import { UnitSalePlanDetailsAttributes } from './unit-sale-plan-details.dto';
   tableName: 'Unit_Sale_Plan_Details',
   timestamps: false,
   comment: 'VIEW',
+  freezeTableName: true,
 })
 export class UnitSalePlanDetailsView extends Model<UnitSalePlanDetailsAttributes> {
   @Column({ type: DataType.INTEGER })
