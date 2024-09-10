@@ -15,7 +15,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         autoLoadModels: true,
-        synchronize: true,
+        synchronize: false,
         logging: false,
         ssl: true,
         sync: {
