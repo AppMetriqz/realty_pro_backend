@@ -24,6 +24,8 @@ import { ProjectPropertyFeaturesModel } from '../../../app/project-property-feat
 import { UnitPropertyFeaturesModel } from '../../../app/unit-property-features/unit-property-features.model';
 import { NotificationModel } from '../../../app/notification/notification.model';
 import { SaleClientHistoryModel } from '../../../app/sale-client-history/sale-client-history.model';
+import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
+import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
 
 @Injectable()
 export class SeederService {
@@ -41,8 +43,9 @@ export class SeederService {
   ) {}
 
   async seeder() {
-    await this.syncModels();
-
+    await this.sequelize.sync({
+      force: false,
+    });
     await Promise.race([
       this.createRoles(),
       this.createStatuses(),
@@ -52,6 +55,11 @@ export class SeederService {
       this.createViewPaymentPendingPlan(),
     ]);
     await this.createUsers();
+
+    this.sequelize.addModels([
+      CurrentPaymentPendingView,
+      UnitSalePlanDetailsView,
+    ]);
 
     console.log('seeder Ready');
   }
@@ -162,25 +170,6 @@ export class SeederService {
       ignoreDuplicates: true,
       updateOnDuplicate: ['user_id'],
     });
-  }
-
-  async syncModels() {
-    await PropertyFeaturesModel.sync();
-    await StatusModel.sync();
-    await ProjectModel.sync();
-    await UnitModel.sync();
-    await ContactModel.sync();
-    await RoleModel.sync();
-    await UserModel.sync();
-    await SaleModel.sync();
-    await PaymentPlanModel.sync();
-    await PaymentPlanDetailModel.sync();
-    await PaymentModel.sync();
-    await ProjectPropertyFeaturesModel.sync();
-    await UnitPropertyFeaturesModel.sync();
-    await NotificationModel.sync();
-    await LoggerModel.sync();
-    await SaleClientHistoryModel.sync();
   }
 
   async createViewUnitSalePlan() {

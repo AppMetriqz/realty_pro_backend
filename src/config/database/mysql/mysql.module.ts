@@ -17,8 +17,6 @@ import { NotificationModel } from '../../../app/notification/notification.model'
 import { LoggerModel } from '../../../app/logger/logger.model';
 import { RoleModel } from '../../../app/role/role.model';
 import { SaleClientHistoryModel } from '../../../app/sale-client-history/sale-client-history.model';
-import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
-import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
 
 @Global()
 @Module({
@@ -33,12 +31,8 @@ import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-detail
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         autoLoadModels: false,
-        synchronize: false,
+        synchronize: true,
         logging: false,
-        sync: {
-          // force: true, //TODO Remover en pro
-          alter: true, //TODO Remover en pro
-        },
         define: {
           createdAt: 'created_at',
           updatedAt: 'updated_at',
@@ -63,8 +57,6 @@ import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-detail
           LoggerModel,
           RoleModel,
           SaleClientHistoryModel,
-          CurrentPaymentPendingView,
-          UnitSalePlanDetailsView,
         ],
       }),
       inject: [ConfigService],

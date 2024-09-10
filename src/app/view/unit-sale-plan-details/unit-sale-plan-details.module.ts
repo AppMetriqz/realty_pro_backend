@@ -3,8 +3,6 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UnitSalePlanDetailsView } from './unit-sale-plan-details.model';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([UnitSalePlanDetailsView]),
-  ],
+  imports: [SequelizeModule.forFeature([UnitSalePlanDetailsView])],
 })
 export class UnitSalePlanDetailsModule {}
