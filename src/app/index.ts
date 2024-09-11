@@ -19,4 +19,8 @@ export * from './desktop/desktop.module';
 export * from './logger/logger.module';
 
 export * from './view/unit-sale-plan-details/unit-sale-plan-details.module';
+
+export * from './view/current-pending-payment/current-pending-payment.module';
+export * from './view/current-overdue-payment/current-overdue-payment.module';
+
 export * from './view/current-payment-pending/current-payment-pending.module';

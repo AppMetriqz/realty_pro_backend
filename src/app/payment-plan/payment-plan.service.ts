@@ -31,6 +31,8 @@ import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 import { CurrentPaymentPendingView } from '../view/current-payment-pending/current-payment-pending.model';
+import { CurrentOverduePaymentView } from '../view/current-overdue-payment/current-overdue-payment.model';
+import { CurrentPendingPaymentView } from '../view/current-pending-payment/current-pending-payment.model';
 
 type Total = {
   qty: number;
@@ -45,8 +47,10 @@ export class PaymentPlanService {
     private readonly model: typeof PaymentPlanModel,
     @InjectModel(PaymentPlanDetailModel)
     private readonly PaymentPlanDetail: typeof PaymentPlanDetailModel,
-    @InjectModel(CurrentPaymentPendingView)
-    private readonly CurrentPaymentPending: typeof CurrentPaymentPendingView,
+    @InjectModel(CurrentOverduePaymentView)
+    private readonly CurrentOverduePayment: typeof CurrentOverduePaymentView,
+    @InjectModel(CurrentPendingPaymentView)
+    private readonly CurrentPendingPayment: typeof CurrentPendingPaymentView,
     @InjectModel(ProjectModel) private readonly Project: typeof ProjectModel,
     @InjectModel(SaleModel) private readonly Sale: typeof SaleModel,
     @InjectModel(NotificationModel)
@@ -114,8 +118,8 @@ export class PaymentPlanService {
 
     const result = await (
       planFilterStats === 'overdue_payment'
-        ? this.CurrentPaymentPending
-        : this.PaymentPlanDetail
+        ? this.CurrentOverduePayment
+        : this.CurrentOverduePayment
     ).findAndCountAll({
       limit,
       offset,

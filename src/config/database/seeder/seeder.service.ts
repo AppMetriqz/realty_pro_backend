@@ -15,17 +15,9 @@ import { UnitModel } from '../../../app/unit/unit.model';
 import { ProjectModel } from '../../../app/project/project.model';
 import { CreateDto } from '../../../app/contact/contact.dto';
 import { Sequelize } from 'sequelize-typescript';
-import { LoggerModel } from '../../../app/logger/logger.model';
-import { SaleModel } from '../../../app/sale/sale.model';
-import { PaymentModel } from '../../../app/payment/payment.model';
-import { PaymentPlanModel } from '../../../app/payment-plan/payment-plan.model';
-import { PaymentPlanDetailModel } from '../../../app/payment-plan-detail/payment-plan-detail.model';
-import { ProjectPropertyFeaturesModel } from '../../../app/project-property-features/project-property-features.model';
-import { UnitPropertyFeaturesModel } from '../../../app/unit-property-features/unit-property-features.model';
-import { NotificationModel } from '../../../app/notification/notification.model';
-import { SaleClientHistoryModel } from '../../../app/sale-client-history/sale-client-history.model';
-import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
 import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
+import { CurrentOverduePaymentView } from '../../../app/view/current-overdue-payment/current-overdue-payment.model';
+import { CurrentPendingPaymentView } from '../../../app/view/current-pending-payment/current-pending-payment.model';
 
 @Injectable()
 export class SeederService {
@@ -52,12 +44,14 @@ export class SeederService {
       this.createContacts(),
       this.createPropertyFeatures(),
       this.createViewUnitSalePlan(),
-      this.createViewPaymentPendingPlan(),
+      this.createViewOverduePayment(),
+      this.createViewPendingPayment(),
     ]);
     await this.createUsers();
 
     this.sequelize.addModels([
-      CurrentPaymentPendingView,
+      CurrentOverduePaymentView,
+      CurrentPendingPaymentView,
       UnitSalePlanDetailsView,
     ]);
 
@@ -211,8 +205,8 @@ export class SeederService {
     console.log('Unit_Sale_Plan_Details CREATED');
   }
 
-  async createViewPaymentPendingPlan() {
-    const View = 'Current_Payment_Pending';
+  async createViewOverduePayment() {
+    const View = 'Current_Overdue_Payment';
     const query = `CREATE OR REPLACE VIEW ${View} AS
         SELECT ppd.*
       FROM payment_plan_details ppd
@@ -221,8 +215,22 @@ export class SeederService {
           FROM payment_plan_details
           WHERE status = 'pending'
           GROUP BY payment_plan_id
-      ) as oldest ON ppd.payment_plan_id = oldest.payment_plan_id 
-      AND ppd.payment_date = oldest.oldest_payment_date`;
+      ) as oldest ON ppd.payment_plan_id = oldest.payment_plan_id AND ppd.payment_date = oldest.oldest_payment_date`;
+    await this.sequelize.query(query);
+    console.log('Current_Payment_Pending CREATED');
+  }
+
+  async createViewPendingPayment() {
+    const View = 'Current_Pending_Payment';
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+        SELECT ppd.*
+      FROM payment_plan_details ppd
+      INNER JOIN (
+          SELECT payment_plan_id, MIN(payment_date) as nearest_payment_date
+          FROM payment_plan_details
+          WHERE status = 'pending'
+          GROUP BY payment_plan_id
+      ) as nearest ON ppd.payment_plan_id = nearest.payment_plan_id AND ppd.payment_date = nearest.oldest_payment_date`;
     await this.sequelize.query(query);
     console.log('Current_Payment_Pending CREATED');
   }

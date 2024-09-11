@@ -11,7 +11,8 @@ import { SaleClientHistoryModel } from '../sale-client-history/sale-client-histo
 import { ContactModel } from '../contact/contact.model';
 import { PaymentModel } from '../payment/payment.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
-import { CurrentPaymentPendingView } from '../view/current-payment-pending/current-payment-pending.model';
+import { CurrentOverduePaymentView } from '../view/current-overdue-payment/current-overdue-payment.model';
+import { CurrentPendingPaymentView } from '../view/current-pending-payment/current-pending-payment.model';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { CurrentPaymentPendingView } from '../view/current-payment-pending/curre
       SaleClientHistoryModel,
       ContactModel,
       UnitSalePlanDetailsView,
-      CurrentPaymentPendingView,
+      CurrentOverduePaymentView,
+      CurrentPendingPaymentView,
     ]),
   ],
   controllers: [PaymentPlanController],
