@@ -11,7 +11,11 @@ import {
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { getImageBase64, onRemoveCircularReferences, StatusCodes } from '../../common/constants';
+import {
+  getImageBase64,
+  onRemoveCircularReferences,
+  StatusCodes,
+} from '../../common/constants';
 import { CurrentUserDto } from '../../common/dto';
 import { ProjectPropertyFeaturesDto } from '../project-property-features/project-property-features.dto';
 import { ProjectPropertyFeaturesModel } from '../project-property-features/project-property-features.model';
@@ -129,7 +133,13 @@ export class ProjectService {
       ],
     });
 
-    const project = ProjectModel.get({ plain: true });
+    const project = {
+      ...ProjectModel.get({ plain: true }),
+      cover: getImageBase64(
+        ProjectModel.cover as Buffer,
+        ProjectModel.cover_mimetype,
+      ),
+    };
 
     if (!project.is_active) {
       return {
@@ -488,7 +498,7 @@ export class ProjectService {
         body.cover = await sharp(file.buffer)
           .resize(800)
           .webp({ effort: 3 })
-          .toBuffer();
+          .toBuffer()
         body.cover_mimetype = file.mimetype;
       }
       const model = await this.model.create(body, { transaction });
