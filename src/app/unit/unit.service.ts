@@ -198,7 +198,7 @@ export class UnitService {
     return this.sequelize.transaction(async (transaction) => {
       if (file) {
         body.cover = await sharp(file.buffer)
-          .resize(800)
+          .resize(1024)
           .webp({ effort: 3 })
           .toBuffer();
         body.cover_mimetype = file.mimetype;
@@ -300,7 +300,7 @@ export class UnitService {
 
       if (file) {
         body.cover = await sharp(file.buffer)
-          .resize(800)
+          .resize(1024)
           .webp({ effort: 3 })
           .toBuffer();
         body.cover_mimetype = file.mimetype;

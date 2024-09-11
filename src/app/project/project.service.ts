@@ -496,7 +496,7 @@ export class ProjectService {
     return await this.sequelize.transaction(async (transaction) => {
       if (!_.isEmpty(file)) {
         body.cover = await sharp(file.buffer)
-          .resize(800)
+          .resize(1024)
           .webp({ effort: 3 })
           .toBuffer()
         body.cover_mimetype = file.mimetype;
@@ -551,7 +551,7 @@ export class ProjectService {
 
       if (file) {
         body.cover = await sharp(file.buffer)
-          .resize(800)
+          .resize(1024)
           .webp({ effort: 3 })
           .toBuffer();
         body.cover_mimetype = file.mimetype;

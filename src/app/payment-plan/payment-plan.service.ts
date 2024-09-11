@@ -112,11 +112,7 @@ export class PaymentPlanService {
 
     // let result = []
 
-    const result = await (
-      planFilterStats === 'overdue_payment'
-        ? this.CurrentPaymentPending
-        : this.PaymentPlanDetail
-    ).findAndCountAll({
+    const result = await this.CurrentPaymentPending.findAndCountAll({
       limit,
       offset,
       distinct: true,
@@ -159,6 +155,7 @@ export class PaymentPlanService {
           ],
         },
       ],
+      order: [['payment_date', 'ASC']],
     });
 
     const rows = result.rows.map((result) => {
