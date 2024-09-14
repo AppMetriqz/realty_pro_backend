@@ -45,6 +45,7 @@ export class SeederService {
   async seeder() {
     await this.sequelize.sync({
       force: false,
+      alter: true,
     });
     await Promise.race([
       this.createRoles(),

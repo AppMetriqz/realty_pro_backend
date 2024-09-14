@@ -17,12 +17,10 @@ export class CustomFileValidator implements PipeTransform {
 export class CustomFilesValidator implements PipeTransform {
   async transform(values: Array<Express.Multer.File>) {
     const files = _.flatten(_.values(values));
-
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       await onCheckFile(file, files);
     }
-
     return files;
   }
 }

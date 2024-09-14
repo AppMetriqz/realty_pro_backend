@@ -541,8 +541,6 @@ export class ProjectService {
       };
     }
 
-    console.log('file', file);
-
     const project_id = id;
     const property_feature_ids = body.property_feature_ids;
 

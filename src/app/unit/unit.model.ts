@@ -81,7 +81,7 @@ export class UnitModel extends Model<UnitDto> {
   @Column({ type: DataType.DOUBLE(20, 2), allowNull: false })
   price: number;
 
-  @Column({ type: DataType.BLOB, defaultValue: null })
+  @Column({ type: DataType.BLOB({ length: 'long' }), defaultValue: null })
   cover: Buffer;
 
   @Column({ type: DataType.STRING, defaultValue: null })

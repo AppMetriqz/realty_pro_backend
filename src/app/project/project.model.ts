@@ -72,7 +72,7 @@ export class ProjectModel extends Model<ProjectDto> {
   @Column({ type: DataType.FLOAT, defaultValue: null })
   longitude: number;
 
-  @Column({ type: DataType.BLOB, defaultValue: null })
+  @Column({ type: DataType.BLOB({ length: 'long' }), defaultValue: null })
   cover: Buffer;
 
   @Column({ type: DataType.STRING, defaultValue: null })
