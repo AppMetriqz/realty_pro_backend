@@ -92,7 +92,7 @@ export class ProjectController {
   async create(
     @Body() body: CreateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
   ) {
     return this.service.create({ body, currentUser, file });
   }
@@ -106,7 +106,7 @@ export class ProjectController {
     @Param('id') id: number,
     @Body() body: UpdateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
   ) {
     const response: unknown = await this.service.update({
       id,

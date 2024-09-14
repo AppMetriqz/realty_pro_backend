@@ -60,12 +60,14 @@ export class UnitController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('cover', { storage: multer.memoryStorage() }))
+  @UseInterceptors(
+    FileInterceptor('cover', { storage: multer.memoryStorage() }),
+  )
   @UseFilters(new HttpExceptionFilter())
   async create(
     @Body() body: CreateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
   ) {
     return this.service.create({ body, currentUser, file });
   }
@@ -77,7 +79,7 @@ export class UnitController {
     @Param('id') id: number,
     @Body() body: UpdateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
   ) {
     const response: unknown = await this.service.update({
       id,
@@ -95,7 +97,9 @@ export class UnitController {
   }
 
   @Put('all/:project_id')
-  @UseInterceptors(FileInterceptor('cover',{ storage: multer.memoryStorage() }))
+  @UseInterceptors(
+    FileInterceptor('cover', { storage: multer.memoryStorage() }),
+  )
   @UseFilters(new HttpExceptionFilter())
   async updateAll(
     @Param('project_id') id: number,
