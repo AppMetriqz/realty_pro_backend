@@ -13,14 +13,15 @@ import * as session from 'express-session';
 
 async function bootstrap() {
   const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://realty-prop-frontend-783a5201eacf.herokuapp.com',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: corsOptions,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors(corsOptions);
 
@@ -33,9 +34,9 @@ async function bootstrap() {
       secret: 'my-secret',
       resave: false,
       saveUninitialized: false,
-      cookie:{
-        maxAge:3600000 * 24
-      }
+      cookie: {
+        maxAge: 3600000 * 24,
+      },
     }),
   );
 
