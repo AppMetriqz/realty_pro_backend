@@ -15,15 +15,6 @@ import { UnitModel } from '../../../app/unit/unit.model';
 import { ProjectModel } from '../../../app/project/project.model';
 import { CreateDto } from '../../../app/contact/contact.dto';
 import { Sequelize } from 'sequelize-typescript';
-import { LoggerModel } from '../../../app/logger/logger.model';
-import { SaleModel } from '../../../app/sale/sale.model';
-import { PaymentModel } from '../../../app/payment/payment.model';
-import { PaymentPlanModel } from '../../../app/payment-plan/payment-plan.model';
-import { PaymentPlanDetailModel } from '../../../app/payment-plan-detail/payment-plan-detail.model';
-import { ProjectPropertyFeaturesModel } from '../../../app/project-property-features/project-property-features.model';
-import { UnitPropertyFeaturesModel } from '../../../app/unit-property-features/unit-property-features.model';
-import { NotificationModel } from '../../../app/notification/notification.model';
-import { SaleClientHistoryModel } from '../../../app/sale-client-history/sale-client-history.model';
 import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
 import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
 

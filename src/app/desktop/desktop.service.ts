@@ -17,7 +17,6 @@ export class DesktopService {
   private readonly oAuth2Client: Auth.OAuth2Client;
   private calendar: any;
   constructor(
-    @InjectModel(UnitModel) private readonly Unit: typeof UnitModel,
     @InjectModel(SaleModel) private readonly Sale: typeof SaleModel,
     readonly configService: ConfigService,
   ) {
@@ -29,16 +28,18 @@ export class DesktopService {
     this.calendar = google.calendar({ version: 'v3', auth: this.oAuth2Client });
   }
 
-  async findAllGoogleCalendar(filters: GoogleCalendarDto) {
-    const token = this.oAuth2Client.credentials;
-    // console.log('token', token);
-    if (_.isEmpty(token)) {
+  async findAllGoogleCalendar(req: any, filters: GoogleCalendarDto) {
+    const accessToken = req.session.google_access_token;
+
+    console.log(accessToken);
+
+    if (!accessToken) {
       return {
         isNeedLogin: true,
         data: [],
       };
     }
-
+    this.oAuth2Client.setCredentials({ access_token: accessToken });
     const times = filters.times;
     const now = DateTime.now();
     let timeMin: Date = now.startOf('day').toJSDate();
@@ -89,13 +90,15 @@ export class DesktopService {
   async findAllSale() {
     return this.Sale.findAll({
       attributes: [
-        [Sequelize.fn('YEAR', Sequelize.col('created_at')), 'year'],
-        [Sequelize.fn('MONTH', Sequelize.col('created_at')), 'month'],
+        [Sequelize.fn('YEAR', Sequelize.col('separated_at')), 'year'],
+        [Sequelize.fn('MONTH', Sequelize.col('separated_at')), 'month'],
         [Sequelize.fn('Count', Sequelize.col('project_id')), 'total'],
       ],
       where: {
         is_active: true,
-        created_at: { [Op.gte]: DateTime.now().minus({ month: 6 }).toJSDate() },
+        separated_at: {
+          [Op.gte]: DateTime.now().minus({ month: 6 }).toJSDate(),
+        },
       },
       group: ['month', 'year'],
       order: [['month', 'ASC']],
@@ -181,18 +184,17 @@ export class DesktopService {
   }
 
   async googleCalendarLogin() {
-    const url = this.oAuth2Client.generateAuthUrl({
+    return this.oAuth2Client.generateAuthUrl({
       access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+      scope: 'https://www.googleapis.com/auth/calendar.readonly',
     });
-    console.log(url);
-    return url;
   }
 
   async googleCallback(req: any) {
     const code = req.query.code;
     const { tokens } = await this.oAuth2Client.getToken(code);
-    this.oAuth2Client.setCredentials(tokens);
+    req.session.google_access_token = tokens.access_token;
+    this.oAuth2Client.setCredentials({ access_token: tokens.access_token });
     return this.configService.get<string>('GOOGLE_CALLBACK_URL_READY');
   }
 }

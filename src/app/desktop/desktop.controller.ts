@@ -26,8 +26,11 @@ export class DesktopController {
 
   @Get('google/calendar')
   @UseFilters(new HttpExceptionFilter())
-  async findAllGoogleCalendar(@Query() filters: GoogleCalendarDto) {
-    return await this.service.findAllGoogleCalendar(filters);
+  async findAllGoogleCalendar(
+    @Req() req: Request,
+    @Query() filters: GoogleCalendarDto,
+  ) {
+    return await this.service.findAllGoogleCalendar(req, filters);
   }
 
   @Get('sales')

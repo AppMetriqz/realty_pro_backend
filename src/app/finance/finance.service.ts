@@ -102,14 +102,16 @@ export class FinanceService {
       raw: true,
       nest: true,
       attributes: [
-        [Sequelize.fn('YEAR', Sequelize.col('created_at')), 'year'],
-        [Sequelize.fn('MONTH', Sequelize.col('created_at')), 'month'],
+        [Sequelize.fn('YEAR', Sequelize.col('separated_at')), 'year'],
+        [Sequelize.fn('MONTH', Sequelize.col('separated_at')), 'month'],
         [Sequelize.fn('Count', Sequelize.col('project_id')), 'total'],
       ],
       where: {
         project_id: projectIds,
         is_active: true,
-        created_at: { [Op.gte]: DateTime.now().minus({ month: 6 }).toJSDate() },
+        separated_at: {
+          [Op.gte]: DateTime.now().minus({ month: 6 }).toJSDate(),
+        },
       },
       group: ['month', 'year'],
       order: [['month', 'ASC']],

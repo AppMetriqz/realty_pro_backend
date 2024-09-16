@@ -515,7 +515,16 @@ export class PaymentPlanService {
         ignoreDuplicates: true,
       });
 
-      await sale.update({ stage: 'payment_plan_in_progress' }, { transaction });
+      await sale.update(
+        {
+          stage: 'payment_plan_in_progress',
+          separated_at: DateTime.fromFormat(
+            separation_date,
+            DateFormat,
+          ).toJSDate(),
+        },
+        { transaction },
+      );
 
       if (is_resale && before_payment_plan_id) {
         const client = await this.Contact.findByPk(client_id, {

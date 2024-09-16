@@ -8,10 +8,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { SeederModule } from './config/database/seeder/seeder.module';
 import { SeederService } from './config/database/seeder/seeder.service';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const corsOptions = {
-    origin: '*',
+    origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
@@ -23,6 +25,19 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   app.setGlobalPrefix('api/v1');
+
+  app.use(cookieParser());
+
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+      cookie:{
+        maxAge:3600000 * 24
+      }
+    }),
+  );
 
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/api/v1/uploads/',

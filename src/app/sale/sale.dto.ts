@@ -14,6 +14,7 @@ export class SaleDto {
   amount_pending_sale?: number;
   notes: string;
   financed_at?: Date;
+  separated_at?: Date;
   stage: string;
   is_active: boolean;
   create_by: number;
