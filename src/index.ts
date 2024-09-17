@@ -37,9 +37,9 @@ async function bootstrap() {
       cookie: {
         maxAge: 3600000 * 24,
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: 'lax',
-        domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
+        // httpOnly: true,
+        // sameSite: 'lax',
+        // domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
       },
     }),
   );
