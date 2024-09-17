@@ -29,10 +29,12 @@ export class DesktopService {
   }
 
   async findAllGoogleCalendar(req: any, filters: GoogleCalendarDto) {
-    const accessToken = req.session.google_access_token;
+    const accessToken = req.cookies.google_access_token;
 
     console.log('google_access_token', accessToken);
     console.log('cookies', req.cookies);
+    console.log('signedCookies', req.signedCookies);
+    console.log('cookies', req.cookies?.google_access_token);
 
     if (!accessToken) {
       return {
@@ -194,8 +196,10 @@ export class DesktopService {
   async googleCallback(req: any) {
     const code = req.query.code;
     const { tokens } = await this.oAuth2Client.getToken(code);
-    req.session.google_access_token = tokens.access_token;
     this.oAuth2Client.setCredentials({ access_token: tokens.access_token });
-    return this.configService.get<string>('GOOGLE_CALLBACK_URL_READY');
+    return {
+      url: this.configService.get<string>('GOOGLE_CALLBACK_URL_READY'),
+      access_token: tokens.access_token,
+    };
   }
 }
