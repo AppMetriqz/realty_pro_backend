@@ -25,6 +25,7 @@ export class DesktopController {
       secure: true,
       sameSite: 'lax',
       maxAge: 3600000 * 24,
+      domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
     });
     res.redirect(302, url);
   }
