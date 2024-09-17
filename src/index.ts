@@ -14,8 +14,8 @@ import * as session from 'express-session';
 async function bootstrap() {
   const corsOptions = {
     origin: [
-      'http://localhost:3000',
       'https://realty-prop-frontend-783a5201eacf.herokuapp.com',
+      'http://localhost:3000',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
@@ -31,7 +31,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: 'my-secret',
+      secret: process.env.JWT_SECRET_KEY,
       resave: false,
       saveUninitialized: false,
       cookie: {
