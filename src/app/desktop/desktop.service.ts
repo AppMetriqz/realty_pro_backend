@@ -196,7 +196,7 @@ export class DesktopService {
   async googleCallback(req: any) {
     const code = req.query.code;
     const { tokens } = await this.oAuth2Client.getToken(code);
-    req.session.google_access_token = tokens.access_token;
+    // req.session.google_access_token = tokens.access_token;
     this.oAuth2Client.setCredentials({ access_token: tokens.access_token });
     return {
       url: this.configService.get<string>('GOOGLE_CALLBACK_URL_READY'),

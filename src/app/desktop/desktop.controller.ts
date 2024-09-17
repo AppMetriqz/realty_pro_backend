@@ -24,8 +24,25 @@ export class DesktopController {
     res.cookie('google_access_token', access_token, {
       secure: true,
       maxAge: 3600000 * 24,
+      sameSite: 'none',
       domain: '.herokuapp.com',
-      // domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
+    });
+    res.cookie('google_access_token1', '1', {
+      secure: true,
+      maxAge: 3600000 * 24,
+      sameSite: 'none',
+    });
+    res.cookie('google_access_token2', '1', {
+      secure: true,
+      maxAge: 3600000 * 24,
+    });
+    res.cookie('google_access_token3', '1', {
+      maxAge: 3600000 * 24,
+    });
+    res.cookie('google_access_token4', '1');
+
+    res.cookie('google_access_token4', '1', {
+      domain: '.herokuapp.com',
     });
     res.redirect(302, url);
   }
