@@ -21,18 +21,7 @@ export class DesktopController {
   @UseFilters(new HttpExceptionFilter())
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     const { url, access_token } = await this.service.googleCallback(req);
-    // res.cookie('google_access_token', access_token, {
-    //   secure: true,
-    //   maxAge: 3600000 * 24,
-    //   sameSite: 'none',
-    //   domain: '.herokuapp.com',
-    // });
-    res.cookie('google_access_token1', access_token, {
-      secure: true,
-      maxAge: 3600000 * 24,
-      sameSite: 'none',
-    });
-    res.cookie('google_access_token2', access_token, {
+    res.cookie('google_access_token', access_token, {
       secure: true,
       maxAge: 3600000 * 24,
       sameSite: 'none',
