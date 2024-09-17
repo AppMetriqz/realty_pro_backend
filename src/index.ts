@@ -38,8 +38,8 @@ async function bootstrap() {
         maxAge: 3600000 * 24,
         secure: process.env.NODE_ENV === 'production',
         // httpOnly: true,
-        // sameSite: 'lax',
-        // domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
+        sameSite: 'none',
+        domain: '.herokuapp.com',
       },
     }),
   );

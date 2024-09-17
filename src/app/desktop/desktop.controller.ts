@@ -23,8 +23,8 @@ export class DesktopController {
     const { url, access_token } = await this.service.googleCallback(req);
     res.cookie('google_access_token', access_token, {
       secure: true,
-      sameSite: 'lax',
       maxAge: 3600000 * 24,
+      domain: '.herokuapp.com',
       // domain: 'realty-prop-frontend-783a5201eacf.herokuapp.com',
     });
     res.redirect(302, url);

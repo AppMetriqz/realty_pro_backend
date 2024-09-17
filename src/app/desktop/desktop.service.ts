@@ -29,10 +29,10 @@ export class DesktopService {
   }
 
   async findAllGoogleCalendar(req: any, filters: GoogleCalendarDto) {
-    const accessToken = req.session.google_access_token;
-    const accessToken2 = req.cookies.google_access_token;
+    // const accessToken = req.session.google_access_token;
+    const accessToken = req.cookies.google_access_token;
     console.log('google_access_token', accessToken);
-    console.log('google_access_token2', accessToken2);
+    // console.log('google_access_token2', accessToken2);
     console.log('cookies', req.cookies);
     console.log('session', req.session);
 
