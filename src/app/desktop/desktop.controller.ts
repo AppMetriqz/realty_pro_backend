@@ -20,10 +20,14 @@ export class DesktopController {
   @Get('google/callback')
   @UseFilters(new HttpExceptionFilter())
   async googleCallback(@Req() req: Request, @Res() res: Response) {
-    const { url, access_token } = await this.service.googleCallback(req);
+    const { url, access_token, expiry_date } =
+      await this.service.googleCallback(req);
     res.cookie('google_access_token', access_token, {
       secure: true,
-      maxAge: 3600000 * 24,
+      sameSite: 'none',
+    });
+    res.cookie('expiry_date', expiry_date.toString(), {
+      secure: true,
       sameSite: 'none',
     });
     res.redirect(302, url);
