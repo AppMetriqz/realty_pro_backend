@@ -72,11 +72,11 @@ export class ProjectModel extends Model<ProjectDto> {
   @Column({ type: DataType.FLOAT, defaultValue: null })
   longitude: number;
 
-  @Column({ type: DataType.BLOB({ length: 'long' }), defaultValue: null })
-  cover: Buffer;
+  @Column({ type: DataType.STRING, defaultValue: null, allowNull: true })
+  cover_name: string;
 
-  @Column({ type: DataType.STRING, defaultValue: null })
-  cover_mimetype: string;
+  @Column({ type: DataType.STRING, defaultValue: null, allowNull: true })
+  cover_path: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   is_active: boolean;

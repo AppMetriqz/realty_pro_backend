@@ -24,8 +24,8 @@ export class ProjectDto {
   address: string;
   latitude: number;
   longitude: number;
-  cover: Buffer | string;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
   is_active?: boolean;
   create_by?: number;
   update_by?: number;
@@ -48,8 +48,8 @@ export class CreateDto {
   address: string;
   latitude: number;
   longitude: number;
-  cover: Buffer;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
 
   @Transform((value) => _.map(_.split(value.value, ','), (n) => _.toNumber(n)))
   @IsArray()
@@ -73,8 +73,8 @@ export class UpdateDto {
   address: string;
   latitude: number;
   longitude: number;
-  cover: Buffer;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
 
   @ValidateIf((o) => !_.isUndefined(o.property_feature_ids))
   @Transform((value) => _.map(_.split(value.value, ','), (n) => _.toNumber(n)))

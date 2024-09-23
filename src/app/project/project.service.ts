@@ -28,7 +28,7 @@ import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { NotificationModel } from '../notification/notification.model';
 import { PaymentModel } from '../payment/payment.model';
-import * as sharp from 'sharp';
+import { CloudinaryService } from 'nestjs-cloudinary';
 
 @Injectable()
 export class ProjectService {
@@ -46,6 +46,7 @@ export class ProjectService {
     @InjectModel(PaymentPlanModel)
     private readonly PaymentPlan: typeof PaymentPlanModel,
     private sequelize: Sequelize,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findAll(filters: FindAllDto) {
@@ -135,10 +136,6 @@ export class ProjectService {
 
     const project = {
       ...ProjectModel.get({ plain: true }),
-      cover: getImageBase64(
-        ProjectModel.cover as Buffer,
-        ProjectModel.cover_mimetype,
-      ),
     };
 
     if (!project.is_active) {
@@ -224,7 +221,8 @@ export class ProjectService {
       unit_meters_to: unit_meters_to_value,
       currency_type: project.currency_type,
       country_code: project.country_code,
-      cover: project.cover,
+      cover_path: project.cover_path,
+      cover_name: project.cover_name,
       property_features: property_features,
       type: project.type,
     };
@@ -408,7 +406,7 @@ export class ProjectService {
       where.currency_type = currencyType;
     }
 
-    const result = await this.model.findAll({
+    return await this.model.findAll({
       raw: true,
       nest: true,
       limit: limit ?? 10,
@@ -432,13 +430,6 @@ export class ProjectService {
           'unit_to_price',
         ],
       ],
-    });
-
-    return _.map(result, (items) => {
-      return {
-        ...items,
-        cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
-      };
     });
   }
 
@@ -478,7 +469,6 @@ export class ProjectService {
       ..._.omit(data, ['project_property_feature']),
       property_features,
       property_feature_ids,
-      cover: getImageBase64(data.cover as Buffer, data.cover_mimetype),
     };
   }
 
@@ -495,11 +485,9 @@ export class ProjectService {
 
     return await this.sequelize.transaction(async (transaction) => {
       if (!_.isEmpty(file)) {
-        body.cover = await sharp(file.buffer)
-          .resize(1024)
-          .webp({ effort: 3 })
-          .toBuffer()
-        body.cover_mimetype = file.mimetype;
+        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        body.cover_path = fileUpload.url;
+        body.cover_name = fileUpload.display_name;
       }
       const model = await this.model.create(body, { transaction });
 
@@ -548,11 +536,9 @@ export class ProjectService {
       body.update_by = currentUser.user_id;
 
       if (file) {
-        body.cover = await sharp(file.buffer)
-          .resize(1024)
-          .webp({ effort: 3 })
-          .toBuffer();
-        body.cover_mimetype = file.mimetype;
+        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        body.cover_path = fileUpload.url;
+        body.cover_name = fileUpload.display_name;
       }
 
       const modelUpdated = await model.update(body, {

@@ -1,3 +1,7 @@
+import '../instrument';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
+import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { Module } from '@nestjs/common';
 import {
   UserModule,
@@ -22,13 +26,20 @@ import {
   UnitSalePlanDetailsModule,
   CurrentPaymentPendingModule,
 } from './app';
-import { ConfigurationModule, FileModule, MysqlModule } from './config';
+import {
+  ConfigurationModule,
+  FileModule,
+  MysqlModule,
+  CloudinaryClientModule,
+} from './config';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigurationModule,
     MysqlModule,
     FileModule,
+    CloudinaryClientModule,
     AuthModule,
     UserModule,
     RoleModule,
@@ -50,6 +61,12 @@ import { ConfigurationModule, FileModule, MysqlModule } from './config';
     LoggerModule,
     UnitSalePlanDetailsModule,
     CurrentPaymentPendingModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
   ],
 })
 export class AppModule {}

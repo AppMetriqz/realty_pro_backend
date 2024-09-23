@@ -1,7 +1,6 @@
 import {
   IsNotEmpty,
   IsEnum,
-  IsNumber,
   ValidateIf,
   IsString,
   IsArray,
@@ -29,8 +28,8 @@ export class UnitDto {
   bathrooms: number;
   price_per_meter: number;
   price: number;
-  cover: Buffer |string;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
   status: string;
   is_active: boolean;
   create_by?: number;
@@ -54,8 +53,8 @@ export class CreateDto {
   bathrooms: number;
   price: number;
   price_per_meter: number;
-  cover: Buffer;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
   status: string;
 
   @Transform((value) =>
@@ -85,8 +84,8 @@ export class UpdateDto {
   bathrooms: number;
   price: number;
   price_per_meter: number;
-  cover: Buffer;
-  cover_mimetype: string;
+  cover_name: string;
+  cover_path: string;
   status: string;
 
   @Transform((value) =>

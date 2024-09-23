@@ -21,12 +21,10 @@ import {
 import { ProjectService } from './project.service';
 import { CatchException, HttpExceptionFilter } from '../../common/exceptions';
 import * as _ from 'lodash';
-
 import { ExceptionDto } from '../../common/dto/http-exception-filter.dto';
 import { CurrentUser } from '../../common/decorators';
 import { CurrentUserDto } from '../../common/dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CustomFileValidator } from '../../common/pipe/file';
 import * as multer from 'multer';
 
 @Controller('projects')
@@ -92,7 +90,7 @@ export class ProjectController {
   async create(
     @Body() body: CreateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.service.create({ body, currentUser, file });
   }
@@ -106,7 +104,7 @@ export class ProjectController {
     @Param('id') id: number,
     @Body() body: UpdateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const response: unknown = await this.service.update({
       id,

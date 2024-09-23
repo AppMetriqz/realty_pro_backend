@@ -34,6 +34,7 @@ import { ContactModel } from '../contact/contact.model';
 import { createNotifications } from '../sale/sale.core';
 import { SaleClientHistoryModel } from '../sale-client-history/sale-client-history.model';
 import * as sharp from 'sharp';
+import { CloudinaryService } from 'nestjs-cloudinary';
 
 @Injectable()
 export class UnitService {
@@ -54,6 +55,7 @@ export class UnitService {
     private readonly SaleClientHistory: typeof SaleClientHistoryModel,
     @InjectModel(ContactModel) private readonly Contact: typeof ContactModel,
     private sequelize: Sequelize,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findAll(filters: FindAllDto) {
@@ -124,7 +126,6 @@ export class UnitService {
       rows: _.map(rows, (items) => {
         return {
           ...items,
-          cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
         };
       }),
     };
@@ -132,7 +133,7 @@ export class UnitService {
 
   async findAllAutocomplete(filters: FindAllAutocompleteDto) {
     const description = filters.description;
-    const result =  await this.model.findAll({
+    const result = await this.model.findAll({
       limit: 10,
       order: [['name', 'ASC']],
       where: {
@@ -146,7 +147,6 @@ export class UnitService {
     return _.map(result, (items) => {
       return {
         ...items,
-        cover: getImageBase64(items.cover as Buffer, items.cover_mimetype),
       };
     });
   }
@@ -180,7 +180,6 @@ export class UnitService {
       client: client ?? null,
       property_feature_ids,
       property_features,
-      cover: getImageBase64(data.cover as Buffer, data.cover_mimetype),
     };
   }
 
@@ -197,11 +196,9 @@ export class UnitService {
 
     return this.sequelize.transaction(async (transaction) => {
       if (file) {
-        body.cover = await sharp(file.buffer)
-          .resize(1024)
-          .webp({ effort: 3 })
-          .toBuffer();
-        body.cover_mimetype = file.mimetype;
+        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        body.cover_path = fileUpload.public_id;
+        body.cover_name = fileUpload.name;
       }
       const model = await this.model.create(body, { transaction });
 
@@ -299,11 +296,13 @@ export class UnitService {
       body.update_by = currentUser.user_id;
 
       if (file) {
-        body.cover = await sharp(file.buffer)
-          .resize(1024)
-          .webp({ effort: 3 })
-          .toBuffer();
-        body.cover_mimetype = file.mimetype;
+        const cover_path = model.cover_path;
+        await this.cloudinaryService.cloudinaryInstance.uploader.destroy(
+          cover_path,
+        );
+        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        body.cover_path = fileUpload.public_id;
+        body.cover_name = fileUpload.name;
       }
 
       const modelUpdated = await model.update(body, {

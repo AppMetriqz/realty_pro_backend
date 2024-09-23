@@ -35,11 +35,10 @@ export class DesktopService {
       : null;
     const currentDate = Date.now();
 
-    console.log('cookies', req.cookies);
-
-    console.log('accessToken', accessToken);
-    console.log('expiryDate', expiryDate);
-    console.log('currentDate', currentDate);
+    // console.log('cookies', req.cookies);
+    // console.log('accessToken', accessToken);
+    // console.log('expiryDate', expiryDate);
+    // console.log('currentDate', currentDate);
 
     if (!accessToken || !expiryDate || expiryDate < currentDate) {
       return {
@@ -201,7 +200,7 @@ export class DesktopService {
   async googleCallback(req: any) {
     const code = req.query.code;
     const { tokens } = await this.oAuth2Client.getToken(code);
-    console.log(tokens);
+    // console.log(tokens);
     this.oAuth2Client.setCredentials({ access_token: tokens.access_token });
     return {
       url: this.configService.get<string>('GOOGLE_CALLBACK_URL_READY'),

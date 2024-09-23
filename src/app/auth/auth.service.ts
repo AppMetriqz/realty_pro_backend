@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { StatusCodes } from '../../common/constants';
 import { ModelProperties } from '../user/user.core';
 import { Op } from 'sequelize';
-import * as _ from 'lodash';
 import { getJwtPayload } from './auth.core';
 
 @Injectable()

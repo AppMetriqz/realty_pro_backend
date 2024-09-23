@@ -27,7 +27,6 @@ import { ExceptionDto } from '../../common/dto/http-exception-filter.dto';
 import { CurrentUser } from '../../common/decorators';
 import { CurrentUserDto } from '../../common/dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CustomFileValidator } from '../../common/pipe/file';
 import * as multer from 'multer';
 
 @Controller('units')
@@ -67,7 +66,7 @@ export class UnitController {
   async create(
     @Body() body: CreateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.service.create({ body, currentUser, file });
   }
@@ -79,7 +78,7 @@ export class UnitController {
     @Param('id') id: number,
     @Body() body: UpdateDto,
     @CurrentUser() currentUser: CurrentUserDto,
-    @UploadedFile(new CustomFileValidator()) file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const response: unknown = await this.service.update({
       id,
@@ -97,9 +96,6 @@ export class UnitController {
   }
 
   @Put('all/:project_id')
-  @UseInterceptors(
-    FileInterceptor('cover', { storage: multer.memoryStorage() }),
-  )
   @UseFilters(new HttpExceptionFilter())
   async updateAll(
     @Param('project_id') id: number,

@@ -12,11 +12,20 @@ import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 
 async function bootstrap() {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const origin = [
+    'https://realtor.metriqz.com',
+    'https://realty.metriqz.com',
+    'https://realty-prop-frontend-783a5201eacf.herokuapp.com',
+  ];
+
+  if (!isProduction) {
+    origin.push('http://localhost:3000');
+  }
+
   const corsOptions = {
-    origin: [
-      'https://realty-prop-frontend-783a5201eacf.herokuapp.com',
-      'http://localhost:3000',
-    ],
+    origin: origin,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
@@ -36,7 +45,7 @@ async function bootstrap() {
       saveUninitialized: false,
       cookie: {
         maxAge: 3600000 * 24,
-        secure: process.env.NODE_ENV === 'production',
+        secure: isProduction,
         // httpOnly: true,
         sameSite: 'none',
         domain: '.herokuapp.com',
