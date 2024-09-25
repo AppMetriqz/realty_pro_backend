@@ -196,7 +196,9 @@ export class UnitService {
 
     return this.sequelize.transaction(async (transaction) => {
       if (file) {
-        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        const fileUpload = await this.cloudinaryService.uploadFile(file, {
+          transformation: { quality: 100 },
+        });
         body.cover_path = fileUpload.public_id;
         body.cover_name = fileUpload.name;
       }
@@ -300,7 +302,9 @@ export class UnitService {
         await this.cloudinaryService.cloudinaryInstance.uploader.destroy(
           cover_path,
         );
-        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        const fileUpload = await this.cloudinaryService.uploadFile(file, {
+          transformation: { quality: 100 },
+        });
         body.cover_path = fileUpload.public_id;
         body.cover_name = fileUpload.name;
       }

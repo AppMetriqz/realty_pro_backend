@@ -485,7 +485,9 @@ export class ProjectService {
 
     return await this.sequelize.transaction(async (transaction) => {
       if (!_.isEmpty(file)) {
-        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        const fileUpload = await this.cloudinaryService.uploadFile(file, {
+          transformation: { quality: 100 },
+        });
         body.cover_path = fileUpload.url;
         body.cover_name = fileUpload.display_name;
       }
@@ -536,7 +538,9 @@ export class ProjectService {
       body.update_by = currentUser.user_id;
 
       if (file) {
-        const fileUpload = await this.cloudinaryService.uploadFile(file);
+        const fileUpload = await this.cloudinaryService.uploadFile(file, {
+          transformation: { quality: 100 },
+        });
         body.cover_path = fileUpload.url;
         body.cover_name = fileUpload.display_name;
       }
