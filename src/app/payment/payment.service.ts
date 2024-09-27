@@ -12,6 +12,7 @@ import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-deta
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { SaleModel } from '../sale/sale.model';
 import { LoggerModel } from '../logger/logger.model';
+import { PaymentPlanDto } from '../payment-plan/payment-plan.dto';
 
 @Injectable()
 export class PaymentService {
@@ -75,20 +76,6 @@ export class PaymentService {
       };
     }
 
-    if (paymentPlan.status === 'paid') {
-      return {
-        ...StatusCodes.BadRequest,
-        message: 'No tiene deuda pendiente',
-      };
-    }
-
-    if (paymentPlan.status === 'paid') {
-      return {
-        ...StatusCodes.BadRequest,
-        message: 'Esta unidad ya ha sido financiada',
-      };
-    }
-
     const paymentPlanDetailsModel = await this.PaymentPlanDetail.findAll({
       where: {
         payment_plan_id: body.payment_plan_id,
@@ -98,10 +85,11 @@ export class PaymentService {
     });
 
     if (_.isEmpty(paymentPlanDetailsModel)) {
-      return {
-        ...StatusCodes.BadRequest,
-        message: 'No tiene deuda pendiente',
-      };
+      return this.addExtraAmount({
+        currentUser,
+        paymentPlan,
+        body,
+      });
     }
 
     const paymentPlanDetails = _.orderBy(
@@ -219,6 +207,51 @@ export class PaymentService {
           { where: { sale_id: paymentPlan.sale_id }, transaction },
         );
       }
+
+      return payment;
+    });
+  }
+
+  async addExtraAmount({
+    currentUser,
+    body,
+    paymentPlan,
+  }: {
+    currentUser: CurrentUserDto;
+    body: CreateDto;
+    paymentPlan: PaymentPlanDto;
+  }) {
+    const amount_paid = body.amount;
+    const payment_made_at = body.payment_made_at
+      ? body.payment_made_at
+      : new Date();
+
+    return await this.sequelize.transaction(async (transaction) => {
+      const values = {
+        payment_plan_id: body.payment_plan_id,
+        project_id: paymentPlan.project_id,
+        unit_id: paymentPlan.unit_id,
+        sale_id: paymentPlan.sale_id,
+        amount: amount_paid,
+        create_by: currentUser.user_id,
+        payment_made_at: payment_made_at,
+        notes: body.notes,
+      };
+
+      const payment = await this.model.create(values, { transaction });
+
+      const Plan = await this.PaymentPlanDetail.findOne({
+        limit: 1,
+        order: [['payment_plan_detail_id', 'DESC']],
+        where: {
+          payment_plan_id: body.payment_plan_id,
+        },
+      });
+
+      await Plan.increment({
+        total_amount_paid: amount_paid,
+        amount_paid: amount_paid,
+      });
 
       return payment;
     });

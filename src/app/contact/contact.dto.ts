@@ -152,7 +152,7 @@ export class FindAllDto {
   dateTo: string;
 
   @IsNotEmpty()
-  @Transform(({ value }) => _.split(value.value, ',').filter((v) => v !== ''))
+  @Transform(({ value }) => _.split(value, ',').filter((v) => v !== ''))
   @IsArray()
   type: string[];
 
