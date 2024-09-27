@@ -167,8 +167,87 @@ export class SeederService {
   async createViewUnitSalePlan() {
     const View = 'Unit_Sale_Plan_Details';
 
+    const sale_id =
+      '(SELECT sale_id from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
     const payment_plan_id =
-      "(SELECT payment_plan_id  from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
+      "(SELECT payment_plan_id from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid', 'resold'))";
+    const payment_separation =
+      "COALESCE((SELECT SUM(separation_amount) as separation_amount from payment_plans WHERE payment_plans.unit_id = units.unit_id and is_active = 1 and status in ('pending', 'paid', 'resold')),0)";
+    const payment_status =
+      "(SELECT status from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
+    const stage =
+      '(SELECT stage from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
+    const total_additional_amount = `COALESCE((SELECT GREATEST((SUM(amount_paid) - SUM(payment_amount)),0) as total FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
+    const total_paid_amount = `COALESCE((SELECT SUM(amount_paid) FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
+    const total_paid_amount_separation = `COALESCE(((SELECT SUM(amount_paid) FROM payment_plan_details WHERE sale_id = ${sale_id}) + ${payment_separation}),0)`;
+
+    const stat_payment_financing = `
+      GREATEST(
+          CASE 
+              WHEN ${stage} = 'payment_plan_completed' THEN price - ${total_paid_amount_separation}
+              ELSE 0
+          END, 
+          0
+      ) AS stat_payment_financing
+    `;
+
+    const stat_payment_received = `
+    CASE 
+          WHEN (SELECT payment_plan_id FROM payment_plans WHERE payment_plans.unit_id = units.unit_id AND sale_type = 'resale' AND is_active = 1) > 1 THEN 
+              LEAST(
+                  CASE 
+                      WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation}
+                      ELSE ${total_paid_amount_separation}
+                  END,
+                  price
+              )
+          ELSE
+              CASE 
+                  WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation}
+                  ELSE ${total_paid_amount_separation}
+              END
+      END AS stat_payment_received
+    `;
+
+    const stat_payment_pending = `
+             GREATEST(
+          CASE 
+              WHEN ${stage} = 'financed' THEN 0 
+              ELSE price - ${total_paid_amount_separation}
+          END, 
+          0
+      ) AS stat_payment_pending
+    `;
+
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+    SELECT project_id, unit_id,
+    ${sale_id} as sale_id,
+    (SELECT is_active from sales WHERE sales.unit_id = units.unit_id and is_active = 1) as sale_is_active,
+    ${payment_plan_id} as payment_plan_id,
+    status as unit_status, 
+    name as unit_name, 
+    ${stage} as stage, 
+    ${payment_status} as payment_status,
+    price as amount,
+    ${payment_separation} as payment_separation,
+    ${total_paid_amount} as total_paid_amount,
+    ${total_paid_amount_separation} as total_paid_amount_separation,
+    COALESCE((SELECT SUM(payment_amount) FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_due_amount,
+    COALESCE((SELECT GREATEST((SUM(payment_amount) - SUM(amount_paid)),0) as total FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_pending_amount,
+    ${total_additional_amount} as total_additional_amount,
+    ${stat_payment_financing},
+    ${stat_payment_received},
+    ${stat_payment_pending}
+    FROM units where is_active = 1;`;
+    await this.sequelize.query(query);
+    console.log('Unit_Sale_Plan_Details CREATED');
+  }
+
+  async createViewUnitSalePlan__OLD() {
+    const View = 'Unit_Sale_Plan_Details';
+
+    const payment_plan_id =
+      "(SELECT payment_plan_id from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
     const payment_separation =
       "COALESCE((SELECT separation_amount from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid')),0)";
     const payment_status =
