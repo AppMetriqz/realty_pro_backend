@@ -7,6 +7,7 @@ import { ProjectPropertyFeaturesModel } from '../project-property-features/proje
 import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
 import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { SaleModel } from '../sale/sale.model';
+import { ContactPaymentPlanView } from '../view/contact-payment-plan/contact-payment-plan.model';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SaleModel } from '../sale/sale.model';
       SaleModel,
       PaymentPlanModel,
       PaymentPlanDetailModel,
+      ContactPaymentPlanView,
     ]),
   ],
   controllers: [ContactController],

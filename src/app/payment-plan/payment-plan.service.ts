@@ -67,25 +67,29 @@ export class PaymentPlanService {
     const sort_by = filters.sortBy;
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
+    const projectIds = filters.projectIds;
+
+    const isAll: boolean = projectIds[0] === 0;
 
     let order = undefined;
-    const projectIds = filters.projectIds;
+
     const planFilterStats = filters.planFilterStats;
 
     const today = DateTime.now().setZone('America/Santo_Domingo');
 
     const where: {
       is_active: boolean;
-      project_id: WhereOperators;
+      project_id?: number[];
       status?: string;
       created_at?: WhereOperators;
       payment_date?: WhereOperators;
     } = {
       is_active: true,
-      project_id: {
-        [Op.in]: projectIds,
-      },
     };
+
+    if (!isAll) {
+      where.project_id = projectIds;
+    }
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
       order = [[sort_by, sort_order]];
@@ -193,6 +197,14 @@ export class PaymentPlanService {
     let order = undefined;
     const projectIds = filters.projectIds;
 
+    const isAll: boolean = projectIds[0] === 0;
+
+    const where: { project_id?: number[] } = {};
+
+    if (!isAll) {
+      where.project_id = projectIds;
+    }
+
     const today = DateTime.now().setZone('America/Santo_Domingo');
 
     if (_.size(sort_order) > 0 && _.size(sort_by) > 0) {
@@ -207,7 +219,7 @@ export class PaymentPlanService {
       raw: true,
       distinct: true,
       where: {
-        project_id: projectIds,
+        ...where,
         status: 'paid',
         is_active: true,
       },
@@ -297,6 +309,14 @@ export class PaymentPlanService {
   async findAllStats(filters: FindStatsDto) {
     const projectIds = filters.projectIds;
 
+    const isAll: boolean = projectIds[0] === 0;
+
+    const where: { project_id?: number[] } = {};
+
+    if (!isAll) {
+      where.project_id = projectIds;
+    }
+
     const today = DateTime.now()
       .setZone('America/Santo_Domingo')
       .toFormat(DateFormat);
@@ -313,10 +333,8 @@ export class PaymentPlanService {
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
+        ...where,
         is_active: true,
-        project_id: {
-          [Op.in]: projectIds,
-        },
         payment_date: {
           [Op.lt]: today,
         },
@@ -336,10 +354,8 @@ export class PaymentPlanService {
         [Sequelize.fn('Count', Sequelize.col('payment_plan_detail_id')), 'qty'],
       ],
       where: {
+        ...where,
         is_active: true,
-        project_id: {
-          [Op.in]: projectIds,
-        },
         payment_date: {
           [Op.gte]: today,
         },
@@ -350,8 +366,8 @@ export class PaymentPlanService {
     const financing_payments = await this.UnitSalePlanDetails.findAll({
       attributes: ['stat_payment_financing'],
       where: {
+        ...where,
         stage: 'payment_plan_completed',
-        project_id: projectIds,
       },
     });
 

@@ -17,6 +17,8 @@ import { CreateDto } from '../../../app/contact/contact.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
 import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
+import { ContactPaymentPlanView } from '../../../app/view/contact-payment-plan/contact-payment-plan.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class SeederService {
@@ -45,12 +47,14 @@ export class SeederService {
       this.createPropertyFeatures(),
       this.createViewUnitSalePlan(),
       this.createViewPaymentPendingPlan(),
+      this.createViewContactPaymentPlan(),
     ]);
     await this.createUsers();
 
     this.sequelize.addModels([
       CurrentPaymentPendingView,
       UnitSalePlanDetailsView,
+      ContactPaymentPlanView,
     ]);
 
     console.log('seeder Ready');
@@ -296,5 +300,42 @@ export class SeederService {
       AND ppd.payment_date = oldest.oldest_payment_date`;
     await this.sequelize.query(query);
     console.log('Current_Payment_Pending CREATED');
+  }
+
+  async createViewContactPaymentPlan() {
+    const View = 'Contact_Payment_Plan';
+
+    const client_ids = `(SELECT GROUP_CONCAT(client_id) AS client_ids FROM sale_client_history WHERE sale_id = plan.sale_id)`;
+
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+      SELECT 
+        plan.payment_plan_id,
+        plan.sale_id,
+        plan.project_id,
+        plan.unit_id,
+        sales.client_id as current_client_id,
+        ${client_ids} as client_ids,
+        plan.sale_type,
+        plan.separation_amount,
+        plan.separation_date,
+        plan.payment_plan_numbers,
+        plan.separation_rate,
+        plan.total_amount,
+        plan.status,
+        plan.paid_at,
+        plan.notes,
+        plan.is_active,
+        (SELECT Sum(payment_amount) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = plan.payment_plan_id) as total_payment_amount,
+        (SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = plan.payment_plan_id) as total_amount_paid,
+        plan.create_by,
+        plan.update_by,
+        plan.created_at,
+        plan.updated_at
+      FROM payment_plans as plan
+      LEFT JOIN 
+              sales ON sales.sale_id = plan.sale_id
+      `;
+    await this.sequelize.query(query);
+    console.log(`${View} CREATED`);
   }
 }

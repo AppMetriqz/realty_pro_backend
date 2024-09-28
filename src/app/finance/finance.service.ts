@@ -27,21 +27,25 @@ export class FinanceService {
   async findAll(filters: FindAllDto) {
     const projectIds = filters.projectIds;
 
+    const isAll: boolean = projectIds[0] === 0;
+
+    const where: { project_id?: number[] } = {};
+
+    if (!isAll) {
+      where.project_id = projectIds;
+    }
+
     const total_capacity_promise = await this.UnitSalePlanDetails.sum(
       'amount',
       {
-        where: {
-          project_id: projectIds,
-        },
+        where: { ...where },
       },
     );
 
     const payments_received_promise = await this.UnitSalePlanDetails.sum(
       'stat_payment_received',
       {
-        where: {
-          project_id: projectIds,
-        },
+        where: { ...where },
       },
     );
 
@@ -49,7 +53,7 @@ export class FinanceService {
       'stat_payment_pending',
       {
         where: {
-          project_id: projectIds,
+          ...where,
           unit_status: 'sold',
           sale_is_active: true,
         },
@@ -64,7 +68,7 @@ export class FinanceService {
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
       ],
       where: {
-        project_id: projectIds,
+        ...where,
         status: 'available',
         is_active: true,
       },
@@ -78,7 +82,7 @@ export class FinanceService {
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
       ],
       where: {
-        project_id: projectIds,
+        ...where,
         status: 'sold',
         is_active: true,
       },
@@ -92,7 +96,7 @@ export class FinanceService {
         [Sequelize.fn('count', Sequelize.col('project_id')), 'qty'],
       ],
       where: {
-        project_id: projectIds,
+        ...where,
         status: 'reserved',
         is_active: true,
       },
@@ -107,7 +111,7 @@ export class FinanceService {
         [Sequelize.fn('Count', Sequelize.col('project_id')), 'total'],
       ],
       where: {
-        project_id: projectIds,
+        ...where,
         is_active: true,
         separated_at: {
           [Op.gte]: DateTime.now().minus({ month: 6 }).toJSDate(),
@@ -119,7 +123,7 @@ export class FinanceService {
 
     const separations = await this.UnitSalePlanDetails.count({
       where: {
-        project_id: projectIds,
+        ...where,
         stage: 'separation',
       },
     });
@@ -127,7 +131,7 @@ export class FinanceService {
     const payment_plans_in_progress_promise =
       await this.UnitSalePlanDetails.count({
         where: {
-          project_id: projectIds,
+          ...where,
           payment_status: ['pending', 'resold'],
           stage: 'payment_plan_in_progress',
         },
@@ -136,7 +140,7 @@ export class FinanceService {
     const payment_plans_completed_promise =
       await this.UnitSalePlanDetails.count({
         where: {
-          project_id: projectIds,
+          ...where,
           payment_status: 'paid',
           stage: 'payment_plan_completed',
         },
@@ -144,7 +148,7 @@ export class FinanceService {
 
     const financed_promise = await this.UnitSalePlanDetails.count({
       where: {
-        project_id: projectIds,
+        ...where,
         payment_status: 'paid',
         stage: 'financed',
       },

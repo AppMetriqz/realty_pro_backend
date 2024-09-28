@@ -10,7 +10,7 @@ import {
   UpdateDto,
 } from './contact.dto';
 import * as _ from 'lodash';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import {
   onRemoveCircularReferences,
   StatusCodes,
@@ -25,6 +25,7 @@ import { UnitModel } from '../unit/unit.model';
 import { Sequelize } from 'sequelize-typescript';
 import { WhereOperators } from 'sequelize/types/model';
 import { PaymentModel } from '../payment/payment.model';
+import { ContactPaymentPlanView } from '../view/contact-payment-plan/contact-payment-plan.model';
 
 @Injectable()
 export class ContactService {
@@ -32,6 +33,8 @@ export class ContactService {
     @InjectModel(ContactModel) private readonly model: typeof ContactModel,
     @InjectModel(PaymentPlanModel)
     private readonly PaymentPlan: typeof PaymentPlanModel,
+    @InjectModel(ContactPaymentPlanView)
+    private readonly ContactPaymentPlan: typeof ContactPaymentPlanView,
   ) {}
 
   async findAll(filters: FindAllDto) {
@@ -88,27 +91,28 @@ export class ContactService {
       where.stage = { [Op.notIn]: ['financed'] };
     }
 
-    const paymentsPlan = await this.PaymentPlan.findAll({
+    const paymentsPlan = await this.ContactPaymentPlan.findAll({
       order: [['payment_plan_id', 'DESC']],
       where: {
-        status: { [Op.notIn]: ['canceled'] },
         is_active: true,
+        [Op.or]: [
+          {
+            [Op.and]: [
+              { sale_type: 'sale' },
+              { status: ['resold'] },
+              { current_client_id: { [Op.ne]: id } },
+            ],
+          },
+          {
+            [Op.and]: [
+              { sale_type: 'resale' },
+              { status: ['paid', 'pending'] },
+              { current_client_id: { [Op.eq]: id } },
+            ],
+          },
+        ],
+        [Op.and]: sequelize.literal(`FIND_IN_SET(${id}, client_ids)`),
       },
-      attributes: [
-        ..._.keys(this.PaymentPlan.getAttributes()),
-        [
-          Sequelize.literal(
-            '(SELECT Sum(payment_amount) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = payment_plan.payment_plan_id)',
-          ),
-          'total_payment_amount',
-        ],
-        [
-          Sequelize.literal(
-            '(SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = payment_plan.payment_plan_id)',
-          ),
-          'total_amount_paid',
-        ],
-      ],
       include: [
         {
           model: ProjectModel,
@@ -129,17 +133,6 @@ export class ContactService {
             'financed_at',
           ],
           required: true,
-          include: [
-            {
-              model: ContactModel,
-              attributes: ['contact_id', 'first_name', 'last_name'],
-              as: 'client',
-              where: {
-                contact_id: id,
-              },
-              required: true,
-            },
-          ],
         },
         {
           model: PaymentPlanDetailModel,
