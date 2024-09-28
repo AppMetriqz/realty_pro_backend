@@ -5,6 +5,8 @@ export interface ContactPaymentPlanViewDto {
   unit_id: number;
   current_client_id: number;
   client_ids: string;
+  current_client_full_name: string;
+  resold_at: string | Date;
   sale_type: string;
   separation_amount: number;
   separation_date: string;

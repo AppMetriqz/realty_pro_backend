@@ -55,6 +55,9 @@ export class ContactPaymentPlanView extends Model<ContactPaymentPlanViewDto> {
   @Column({ type: DataType.STRING, allowNull: false })
   client_ids: string;
 
+  @Column({ type: DataType.STRING, allowNull: false })
+  current_client_full_name: string;
+
   @Column({
     type: DataType.ENUM('sale', 'resale'),
     defaultValue: 'sale',
@@ -81,6 +84,9 @@ export class ContactPaymentPlanView extends Model<ContactPaymentPlanViewDto> {
     defaultValue: 'pending',
   })
   status: string;
+
+  @Column({ type: DataType.DATEONLY, defaultValue: null })
+  resold_at: string | Date;
 
   @Column({ type: DataType.DATEONLY, defaultValue: null })
   paid_at: string | Date;
