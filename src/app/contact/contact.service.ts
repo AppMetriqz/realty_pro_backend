@@ -110,6 +110,13 @@ export class ContactService {
               { current_client_id: { [Op.eq]: id } },
             ],
           },
+          {
+            [Op.and]: [
+              { sale_type: 'sale' },
+              { status: ['paid', 'pending'] },
+              { current_client_id: { [Op.eq]: id } },
+            ],
+          },
         ],
         [Op.and]: sequelize.literal(`FIND_IN_SET(${id}, client_ids)`),
       },
