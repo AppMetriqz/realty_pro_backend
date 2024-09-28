@@ -328,7 +328,7 @@ export class SeederService {
         plan.is_active,
         (SELECT Sum(payment_amount) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = plan.payment_plan_id) as total_payment_amount,
         (SELECT Sum(amount_paid) FROM payment_plan_details WHERE payment_plan_details.payment_plan_id = plan.payment_plan_id) as total_amount_paid,
-        (SELECT created_at FROM sale_client_history WHERE sale_client_history.sale_type = 'resale') as resold_at,
+        (SELECT created_at FROM sale_client_history WHERE sale_client_history.sale_type = 'resale' and sale_client_history.sale_id = plan.sale_id) as resold_at,
         plan.create_by,
         plan.update_by,
         plan.created_at,
