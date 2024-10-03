@@ -173,16 +173,23 @@ export class SeederService {
 
     const sale_id =
       '(SELECT sale_id from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
+
     const payment_plan_id =
       "(SELECT payment_plan_id from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid', 'resold'))";
+
     const payment_separation =
       "COALESCE((SELECT SUM(separation_amount) as separation_amount from payment_plans WHERE payment_plans.unit_id = units.unit_id and is_active = 1 and status in ('pending', 'paid', 'resold')),0)";
+
     const payment_status =
-      "(SELECT status from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
+      "(SELECT status from payment_plans WHERE payment_plans.unit_id = units.unit_id and is_active = 1 and status in ('pending', 'paid'))";
+
     const stage =
       '(SELECT stage from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
+
     const total_additional_amount = `COALESCE((SELECT GREATEST((SUM(amount_paid) - SUM(payment_amount)),0) as total FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
+
     const total_paid_amount = `COALESCE((SELECT SUM(amount_paid) FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
+
     const total_paid_amount_separation = `COALESCE(((SELECT SUM(amount_paid) FROM payment_plan_details WHERE sale_id = ${sale_id}) + ${payment_separation}),0)`;
 
     const stat_payment_financing = `
@@ -200,14 +207,14 @@ export class SeederService {
           WHEN (SELECT payment_plan_id FROM payment_plans WHERE payment_plans.unit_id = units.unit_id AND sale_type = 'resale' AND is_active = 1) > 1 THEN 
               LEAST(
                   CASE 
-                      WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation}
+                      WHEN ${stage} = 'financed' THEN (price - ${total_paid_amount_separation}) + ${total_paid_amount_separation}
                       ELSE ${total_paid_amount_separation}
                   END,
                   price
               )
           ELSE
               CASE 
-                  WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation}
+                  WHEN ${stage} = 'financed' THEN (price - ${total_paid_amount_separation}) + ${total_paid_amount_separation}
                   ELSE ${total_paid_amount_separation}
               END
       END AS stat_payment_received

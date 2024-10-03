@@ -78,13 +78,13 @@ export class ProjectService {
         ...Object.keys(this.model.getAttributes()),
         [
           Sequelize.literal(
-            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_from_price',
         ],
         [
           Sequelize.literal(
-            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_to_price',
         ],
@@ -110,13 +110,13 @@ export class ProjectService {
         ...Object.keys(this.model.getAttributes()),
         [
           Sequelize.literal(
-            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_from_price',
         ],
         [
           Sequelize.literal(
-            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_to_price',
         ],
@@ -419,13 +419,13 @@ export class ProjectService {
         ...Object.keys(this.model.getAttributes()),
         [
           Sequelize.literal(
-            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MIN(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_from_price',
         ],
         [
           Sequelize.literal(
-            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id)',
+            '(SELECT MAX(price) FROM units WHERE units.project_id = project.project_id and is_active = 1)',
           ),
           'unit_to_price',
         ],
