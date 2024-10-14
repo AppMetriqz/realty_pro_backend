@@ -7,6 +7,7 @@ export interface UnitSalePlanDetailsAttributes {
   payment_plan_id: number;
   stage: string;
   payment_status: string;
+  currency_type: string;
   amount: number;
   payment_separation: number;
   total_paid_amount: number;

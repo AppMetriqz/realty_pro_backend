@@ -18,7 +18,8 @@ import { Sequelize } from 'sequelize-typescript';
 import { CurrentPaymentPendingView } from '../../../app/view/current-payment-pending/current-payment-pending.model';
 import { UnitSalePlanDetailsView } from '../../../app/view/unit-sale-plan-details/unit-sale-plan-details.model';
 import { ContactPaymentPlanView } from '../../../app/view/contact-payment-plan/contact-payment-plan.model';
-import * as _ from 'lodash';
+import { UnitDetailsView } from '../../../app/view/unit-details/unit-details.model';
+import { SaleDetailsView } from '../../../app/view/sale-details/sale-details.model';
 
 @Injectable()
 export class SeederService {
@@ -48,6 +49,8 @@ export class SeederService {
       this.createViewUnitSalePlan(),
       this.createViewPaymentPendingPlan(),
       this.createViewContactPaymentPlan(),
+      this.createViewUnit(),
+      this.createViewSale(),
     ]);
     await this.createUsers();
 
@@ -55,6 +58,8 @@ export class SeederService {
       CurrentPaymentPendingView,
       UnitSalePlanDetailsView,
       ContactPaymentPlanView,
+      UnitDetailsView,
+      SaleDetailsView,
     ]);
 
     console.log('seeder Ready');
@@ -186,6 +191,9 @@ export class SeederService {
     const stage =
       '(SELECT stage from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
 
+    const currency_type =
+      '(SELECT currency_type from projects WHERE projects.project_id  = units.project_id)';
+
     const total_additional_amount = `COALESCE((SELECT GREATEST((SUM(amount_paid) - SUM(payment_amount)),0) as total FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
 
     const total_paid_amount = `COALESCE((SELECT SUM(amount_paid) FROM payment_plan_details WHERE sale_id = ${sale_id}),0)`;
@@ -238,6 +246,7 @@ export class SeederService {
     status as unit_status, 
     name as unit_name, 
     ${stage} as stage, 
+    ${currency_type} as currency_type, 
     ${payment_status} as payment_status,
     price as amount,
     ${payment_separation} as payment_separation,
@@ -254,49 +263,15 @@ export class SeederService {
     console.log('Unit_Sale_Plan_Details CREATED');
   }
 
-  async createViewUnitSalePlan__OLD() {
-    const View = 'Unit_Sale_Plan_Details';
-
-    const payment_plan_id =
-      "(SELECT payment_plan_id from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
-    const payment_separation =
-      "COALESCE((SELECT separation_amount from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid')),0)";
-    const payment_status =
-      "(SELECT status from payment_plans WHERE payment_plans.unit_id = units.unit_id and sale_type = 'sale' and is_active = 1 and status in ('pending', 'paid'))";
-    const stage =
-      '(SELECT stage from sales WHERE sales.unit_id = units.unit_id and is_active = 1)';
-    const total_additional_amount = `COALESCE((SELECT GREATEST((SUM(amount_paid) - SUM(payment_amount)),0) as total FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0)`;
-    const total_paid_amount = `COALESCE((SELECT SUM(amount_paid) FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0)`;
-    const total_paid_amount_separation = `COALESCE(((SELECT SUM(amount_paid) FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}) + ${payment_separation}),0)`;
-
-    const query = `CREATE OR REPLACE VIEW ${View} AS
-    SELECT project_id, unit_id,
-    (SELECT sale_id from sales WHERE sales.unit_id = units.unit_id and is_active = 1) as sale_id,
-    (SELECT is_active from sales WHERE sales.unit_id = units.unit_id and is_active = 1) as sale_is_active,
-    ${payment_plan_id} as payment_plan_id,
-    status as unit_status, 
-    name as unit_name, 
-    ${stage} as stage, 
-    ${payment_status} as payment_status,
-    price as amount,
-    ${payment_separation} as payment_separation,
-    ${total_paid_amount} as total_paid_amount,
-    ${total_paid_amount_separation} as total_paid_amount_separation,
-    COALESCE((SELECT SUM(payment_amount) FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_due_amount,
-    COALESCE((SELECT GREATEST((SUM(payment_amount) - SUM(amount_paid)),0) as total FROM payment_plan_details WHERE payment_plan_id = ${payment_plan_id}),0) as total_pending_amount,
-    ${total_additional_amount} as total_additional_amount,
-    CASE WHEN ${stage} = 'payment_plan_completed' THEN price - ${total_paid_amount_separation} ELSE 0 END AS stat_payment_financing,
-    CASE WHEN ${stage} = 'financed' THEN price + ${total_paid_amount_separation} ELSE ${total_paid_amount_separation} END AS stat_payment_received,
-    CASE WHEN ${stage} = 'financed' THEN 0 ELSE price - ${total_paid_amount_separation} END AS stat_payment_pending
-    FROM units where is_active = 1;`;
-    await this.sequelize.query(query);
-    console.log('Unit_Sale_Plan_Details CREATED');
-  }
-
   async createViewPaymentPendingPlan() {
     const View = 'Current_Payment_Pending';
+
+    const currency_type =
+      '(SELECT currency_type from projects WHERE projects.project_id  = ppd.project_id)';
+
     const query = `CREATE OR REPLACE VIEW ${View} AS
-        SELECT ppd.*
+        SELECT ppd.*,
+         ${currency_type} as currency_type
       FROM payment_plan_details ppd
       INNER JOIN (
           SELECT payment_plan_id, MIN(payment_date) as oldest_payment_date
@@ -345,6 +320,34 @@ export class SeederService {
               sales ON sales.sale_id = plan.sale_id
       LEFT JOIN 
               contacts ON contacts.contact_id = sales.client_id        
+      `;
+    await this.sequelize.query(query);
+    console.log(`${View} CREATED`);
+  }
+
+  async createViewUnit() {
+    const View = 'Unit_Details';
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+      SELECT 
+         vm.*,
+         projects.currency_type as currency_type
+      FROM units vm
+      LEFT JOIN 
+         projects ON projects.project_id  = vm.project_id 
+      `;
+    await this.sequelize.query(query);
+    console.log(`${View} CREATED`);
+  }
+
+  async createViewSale() {
+    const View = 'Sale_Details';
+    const query = `CREATE OR REPLACE VIEW ${View} AS
+      SELECT 
+         vm.*,
+         projects.currency_type as currency_type
+      FROM sales vm
+      LEFT JOIN 
+         projects ON projects.project_id  = vm.project_id 
       `;
     await this.sequelize.query(query);
     console.log(`${View} CREATED`);

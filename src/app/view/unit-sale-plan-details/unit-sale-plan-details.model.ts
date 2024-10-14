@@ -35,6 +35,9 @@ export class UnitSalePlanDetailsView extends Model<UnitSalePlanDetailsAttributes
   @Column({ type: DataType.DOUBLE(10, 2) })
   amount: number;
 
+  @Column({ type: DataType.STRING })
+  currency_type: string;
+
   @Column({ type: DataType.DOUBLE(22, 2) })
   payment_separation: number;
 

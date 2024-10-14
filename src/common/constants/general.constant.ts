@@ -11,6 +11,11 @@ export const DateFormat = 'yyyy-LL-dd';
 export const PropertyType = ['house', 'apartment', 'plot', 'commercial'];
 export const CurrencyType = ['US', 'RD'];
 
+export enum CurrencyEnumDto {
+  US,
+  RD,
+}
+
 export const ContactType = ['seller', 'client', 'office', 'related'];
 
 export const UnitStatus = ['available', 'sold', 'reserved'];

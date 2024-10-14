@@ -16,6 +16,7 @@ import { SaleModel } from '../sale/sale.model';
 
 @Table({
   tableName: 'payment_plan_details',
+  modelName: 'payment_plan_details',
   indexes: [{ unique: true, fields: ['payment_plan_id', 'payment_number'] }],
 })
 export class PaymentPlanDetailModel extends Model<PaymentPlanDetailDto> {

@@ -8,7 +8,11 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import * as _ from 'lodash';
-import { PlanFilterStats } from '../../common/constants';
+import {
+  CurrencyEnumDto,
+  CurrencyType,
+  PlanFilterStats,
+} from '../../common/constants';
 
 export class PaymentPlanDto {
   payment_plan_id: number;
@@ -128,6 +132,10 @@ export class FindAllDto {
   )
   @IsArray()
   projectIds: number[];
+
+  @ValidateIf((o) => _.isString(o.currencyType) && o.currencyType !== '')
+  @IsEnum(CurrencyType, { message: 'values available : US | RD' })
+  currencyType: keyof typeof CurrencyEnumDto;
 }
 
 export class FindStatsDto {
@@ -140,4 +148,8 @@ export class FindStatsDto {
   )
   @IsArray()
   projectIds: number[];
+
+  @ValidateIf((o) => _.isString(o.currencyType) && o.currencyType !== '')
+  @IsEnum(CurrencyType, { message: 'values available : US | RD' })
+  currencyType: keyof typeof CurrencyEnumDto;
 }

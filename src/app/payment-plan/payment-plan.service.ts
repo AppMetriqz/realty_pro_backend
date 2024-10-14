@@ -31,6 +31,8 @@ import { onFullCancellation } from '../../common/utils/full-cancellation';
 import { PaymentModel } from '../payment/payment.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 import { CurrentPaymentPendingView } from '../view/current-payment-pending/current-payment-pending.model';
+import { SaleDetailsView } from '../view/sale-details/sale-details.model';
+import { UnitDetailsView } from '../view/unit-details/unit-details.model';
 
 type Total = {
   qty: number;
@@ -57,6 +59,10 @@ export class PaymentPlanService {
     @InjectModel(PaymentModel) private readonly Payment: typeof PaymentModel,
     @InjectModel(UnitSalePlanDetailsView)
     private readonly UnitSalePlanDetails: typeof UnitSalePlanDetailsView,
+    @InjectModel(SaleDetailsView)
+    private readonly SaleDetails: typeof SaleDetailsView,
+    @InjectModel(UnitDetailsView)
+    private readonly UnitDetails: typeof UnitDetailsView,
     private sequelize: Sequelize,
   ) {}
 
@@ -68,6 +74,8 @@ export class PaymentPlanService {
     const dateFrom = filters.dateFrom;
     const dateTo = filters.dateTo;
     const projectIds = filters.projectIds;
+
+    const currencyType = filters.currencyType ?? 'US';
 
     const isAll: boolean = projectIds[0] === 0;
 
@@ -120,7 +128,10 @@ export class PaymentPlanService {
       limit,
       offset,
       distinct: true,
-      where: { ...where },
+      where: {
+        ...where,
+        currency_type: currencyType,
+      },
       attributes: {
         exclude: ['payment_plan_id', 'project_id'],
       },
@@ -196,6 +207,7 @@ export class PaymentPlanService {
     const sort_by = filters.sortBy;
     let order = undefined;
     const projectIds = filters.projectIds;
+    const currencyType = filters.currencyType ?? 'US';
 
     const isAll: boolean = projectIds[0] === 0;
 
@@ -222,6 +234,11 @@ export class PaymentPlanService {
         ...where,
         status: 'paid',
         is_active: true,
+        [Op.and]: [
+          Sequelize.literal(
+            `(SELECT currency_type FROM projects WHERE projects.project_id = payment_plan.project_id ) = '${currencyType}'`,
+          ),
+        ],
       },
       attributes: [
         ...Object.keys(this.model.getAttributes()),
@@ -309,6 +326,8 @@ export class PaymentPlanService {
   async findAllStats(filters: FindStatsDto) {
     const projectIds = filters.projectIds;
 
+    const currencyType = filters.currencyType ?? 'US';
+
     const isAll: boolean = projectIds[0] === 0;
 
     const where: { project_id?: number[] } = {};
@@ -339,6 +358,11 @@ export class PaymentPlanService {
           [Op.lt]: today,
         },
         status: 'pending',
+        [Op.and]: [
+          Sequelize.literal(
+            `(SELECT currency_type FROM projects WHERE projects.project_id  = payment_plan_details.project_id ) = '${currencyType}'`,
+          ),
+        ],
       },
     });
 
@@ -360,6 +384,11 @@ export class PaymentPlanService {
           [Op.gte]: today,
         },
         status: 'pending',
+        [Op.and]: [
+          Sequelize.literal(
+            `(SELECT currency_type FROM projects WHERE projects.project_id  = payment_plan_details.project_id ) = '${currencyType}'`,
+          ),
+        ],
       },
     });
 
@@ -368,6 +397,7 @@ export class PaymentPlanService {
       where: {
         ...where,
         stage: 'payment_plan_completed',
+        currency_type: currencyType,
       },
     });
 

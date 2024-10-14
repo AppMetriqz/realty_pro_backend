@@ -26,6 +26,8 @@ import {
   UnitSalePlanDetailsModule,
   CurrentPaymentPendingModule,
   ContactPaymentPlanModule,
+  UnitDetailsModule,
+  SaleDetailsModule,
 } from './app';
 import {
   ConfigurationModule,
@@ -63,6 +65,8 @@ import {
     UnitSalePlanDetailsModule,
     CurrentPaymentPendingModule,
     ContactPaymentPlanModule,
+    UnitDetailsModule,
+    SaleDetailsModule,
   ],
   providers: [
     {

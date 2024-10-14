@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsArray } from 'class-validator';
+import { IsNotEmpty, IsArray, IsEnum, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
 import * as _ from 'lodash';
+import { CurrencyEnumDto, CurrencyType } from '../../common/constants';
 
 export class FindAllDto {
   @IsNotEmpty()
@@ -12,4 +13,8 @@ export class FindAllDto {
   )
   @IsArray()
   projectIds: number[];
+
+  @ValidateIf((o) => _.isString(o.currencyType) && o.currencyType !== '')
+  @IsEnum(CurrencyType, { message: 'values available : US | RD' })
+  currencyType: keyof typeof CurrencyEnumDto;
 }

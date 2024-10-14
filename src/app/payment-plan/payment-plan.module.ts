@@ -12,6 +12,8 @@ import { ContactModel } from '../contact/contact.model';
 import { PaymentModel } from '../payment/payment.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
 import { CurrentPaymentPendingView } from '../view/current-payment-pending/current-payment-pending.model';
+import { SaleDetailsView } from '../view/sale-details/sale-details.model';
+import { UnitDetailsView } from '../view/unit-details/unit-details.model';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { CurrentPaymentPendingView } from '../view/current-payment-pending/curre
       ContactModel,
       UnitSalePlanDetailsView,
       CurrentPaymentPendingView,
+      SaleDetailsView,
+      UnitDetailsView,
     ]),
   ],
   controllers: [PaymentPlanController],

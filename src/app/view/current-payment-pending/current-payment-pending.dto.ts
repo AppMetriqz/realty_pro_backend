@@ -10,6 +10,7 @@ export interface CurrentPaymentPendingViewDto {
   amount_paid: number;
   total_amount_paid: number;
   payment_date: string;
+  currency_type: string;
   paid_at: Date;
   payment_made_at: Date;
   status: string;

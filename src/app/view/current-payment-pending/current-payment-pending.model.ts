@@ -63,6 +63,9 @@ export class CurrentPaymentPendingView extends Model<CurrentPaymentPendingViewDt
   @Column({ type: DataType.DECIMAL(20, 2), defaultValue: 0 })
   total_amount_paid: number;
 
+  @Column({ type: DataType.STRING })
+  currency_type: string;
+
   @Column({ type: DataType.INTEGER, allowNull: false })
   payment_number: number;
 

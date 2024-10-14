@@ -3,33 +3,30 @@ import { InjectModel } from '@nestjs/sequelize';
 import { FindAllDto } from './finance.dto';
 import * as _ from 'lodash';
 import { Op } from 'sequelize';
-import { PaymentPlanDetailModel } from '../payment-plan-detail/payment-plan-detail.model';
 import { Sequelize } from 'sequelize-typescript';
 import { DateTime } from 'luxon';
-import { PaymentPlanModel } from '../payment-plan/payment-plan.model';
-import { UnitModel } from '../unit/unit.model';
-import { SaleModel } from '../sale/sale.model';
 import { UnitSalePlanDetailsView } from '../view/unit-sale-plan-details/unit-sale-plan-details.model';
+import { SaleDetailsView } from '../view/sale-details/sale-details.model';
+import { UnitDetailsView } from '../view/unit-details/unit-details.model';
 
 @Injectable()
 export class FinanceService {
   constructor(
-    @InjectModel(PaymentPlanModel)
-    private readonly PaymentPlan: typeof PaymentPlanModel,
-    @InjectModel(PaymentPlanDetailModel)
-    private readonly PaymentPlanDetail: typeof PaymentPlanDetailModel,
-    @InjectModel(UnitModel) private readonly Unit: typeof UnitModel,
-    @InjectModel(SaleModel) private readonly Sale: typeof SaleModel,
+    @InjectModel(SaleDetailsView) private readonly SaleDetails: typeof SaleDetailsView,
+    @InjectModel(UnitDetailsView) private readonly UnitDetails: typeof UnitDetailsView,
     @InjectModel(UnitSalePlanDetailsView)
     private readonly UnitSalePlanDetails: typeof UnitSalePlanDetailsView,
   ) {}
 
   async findAll(filters: FindAllDto) {
     const projectIds = filters.projectIds;
+    const currencyType = filters.currencyType;
 
     const isAll: boolean = projectIds[0] === 0;
 
-    const where: { project_id?: number[] } = {};
+    const where: { project_id?: number[]; currency_type: string } = {
+      currency_type: currencyType ?? 'US',
+    };
 
     if (!isAll) {
       where.project_id = projectIds;
@@ -60,7 +57,7 @@ export class FinanceService {
       },
     );
 
-    const available_promise = await this.Unit.findAll({
+    const available_promise = await this.UnitDetails.findAll({
       raw: true,
       nest: true,
       attributes: [
@@ -74,7 +71,7 @@ export class FinanceService {
       },
     });
 
-    const sold_promise = await this.Unit.findAll({
+    const sold_promise = await this.UnitDetails.findAll({
       raw: true,
       nest: true,
       attributes: [
@@ -88,7 +85,7 @@ export class FinanceService {
       },
     });
 
-    const reserved_promise = await this.Unit.findAll({
+    const reserved_promise = await this.UnitDetails.findAll({
       raw: true,
       nest: true,
       attributes: [
@@ -102,7 +99,7 @@ export class FinanceService {
       },
     });
 
-    const sales_promise = await this.Sale.findAll({
+    const sales_promise = await this.SaleDetails.findAll({
       raw: true,
       nest: true,
       attributes: [
