@@ -17,7 +17,7 @@ async function bootstrap() {
     'https://realtor.metriqz.com',
     'https://realty.metriqz.com',
     'https://realty-prop-frontend-783a5201eacf.herokuapp.com',
-    'https://stage-frontend-a472ac81f8d5.herokuapp.com',
+    'https://ferel-frontend-4ad8be05c47a.herokuapp.com',
     'https://ferel.metriqz.com',
   ];
 
